@@ -22,11 +22,11 @@ function build_all {
 
     # fip
     if [ -e "${OUT}/${MTK_PLAT}/u-boot.bin" ]; then
-	build_fip "$1" "${OUT}/${MTK_PLAT}/u-boot.bin" "${OUT}/${MTK_PLAT}/tee.bin" "fip_noab.bin"
+	build_fip "$1" "${OUT}/${MTK_PLAT}/tee.bin" "${OUT}/${MTK_PLAT}/u-boot.bin" "fip_noab.bin"
     fi
 
     if [ -e "${OUT}/${MTK_PLAT}/u-boot-ab.bin" ]; then
-	build_fip "$1" "${OUT}/${MTK_PLAT}/u-boot-ab.bin" "${OUT}/${MTK_PLAT}/tee.bin" "fip_ab.bin"
+	build_fip "$1" "${OUT}/${MTK_PLAT}/tee.bin" "${OUT}/${MTK_PLAT}/u-boot-ab.bin"  "fip_ab.bin"
     fi
 }
 
