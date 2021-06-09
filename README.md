@@ -19,6 +19,17 @@ Options:
   --clean    (OPTIONAL) clean before build
 ```
 
+## Build libdram
+``` {.sh}
+usage: build_libdram.sh [options]
+
+$ build_libdram.sh --config=pumpkin-i500.yaml
+
+Options:
+  --config   Mediatek board config file
+  --clean    (OPTIONAL) clean before build
+```
+
 ## Build uboot
 ``` {.sh}
 usage: build_uboot.sh [options]
