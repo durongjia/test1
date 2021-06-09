@@ -15,13 +15,13 @@ function build_lk {
     local MTK_PLAT=$(config_value "$1" plat)
     local MTK_BOARD=$(config_value "$1" lk.board)
     local MTK_LIBDRAM_BOARD=$(config_value "$1" libdram.board)
-    local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}/src/${MTK_PLAT}/libdram.a"
+    local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}-lk/src/${MTK_PLAT}/libdram.a"
     local clean="$2"
 
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
 
     # check if libdram has been compiled
-    ! [ -a "${LIBDRAM_A}" ] && build_libdram "$1"
+    ! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false true
 
     pushd "${LK}"
     [[ "${clean}" == true ]] && clean_lk "${MTK_BOARD}"
