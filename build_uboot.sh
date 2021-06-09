@@ -6,14 +6,13 @@ source "${SRC}/utils.sh"
 UBOOT="${ROOT}/u-boot"
 
 function clean_uboot {
-    pushd "${UBOOT}"
     make clean
-    popd
 }
 
 function build_uboot {
     local MTK_PLAT=$(config_value "$1" plat)
     local build_ab="$3"
+    local clean="$2"
 
     local MTK_DEFCONFIG
     local UBOOT_OUT_BIN
@@ -34,11 +33,11 @@ function build_uboot {
 	return
     fi
 
-    local clean="$2"
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
-    [[ "${clean}" == true ]] && clean_uboot "${MTK_PLAT}"
 
     pushd "${UBOOT}"
+    [[ "${clean}" == true ]] && clean_uboot "${MTK_PLAT}"
+
     aarch64_env
     export ARCH=arm64
 

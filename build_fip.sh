@@ -7,9 +7,7 @@ ATF="${ROOT}/arm-trusted-firmware"
 
 function clean_fip {
     local MTK_PLAT="$1"
-    pushd "${ATF}"
     [ -d "build/${MTK_PLAT}" ] && rm -r "build/${MTK_PLAT}"
-    popd
 }
 
 function build_fip {
@@ -19,14 +17,14 @@ function build_fip {
     local BL32_BIN="$2"
     local BL33_BIN="$3"
     local FIP_BIN="$4"
-
     local clean="$5"
+
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
-    [[ "${clean}" == true ]] && clean_fip "${MTK_PLAT}"
 
     pushd "${ATF}"
-    arm-none_env
+    [[ "${clean}" == true ]] && clean_fip "${MTK_PLAT}"
 
+    arm-none_env
     make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" BL32="${BL32_BIN}" BL33="${BL33_BIN}" \
 	 SPD=opteed LOG_LEVEL=$LOG_LEVEL NEED_BL32=yes NEED_BL33=yes bl31 fip
     cp "build/${MTK_PLAT}/release/fip.bin" "${OUT}/${MTK_PLAT}/${FIP_BIN}"
