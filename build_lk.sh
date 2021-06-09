@@ -20,8 +20,12 @@ function build_lk {
 
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
 
-    # check if libdram has been compiled
-    ! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false true
+    if [[ "${clean}" == true ]]; then
+	build_libdram "$1" true true
+    else
+	# check if libdram has been compiled
+	! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false true
+    fi
 
     pushd "${LK}"
     [[ "${clean}" == true ]] && clean_lk "${MTK_BOARD}"

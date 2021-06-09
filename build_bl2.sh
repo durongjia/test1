@@ -19,8 +19,12 @@ function build_bl2 {
 
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
 
-    # check if libdram has been compiled
-    ! [ -a "${LIBDRAM_A}" ] && build_libdram "$1"
+    if [[ "${clean}" == true ]]; then
+	build_libdram "$1" true false
+    else
+	# check if libdram has been compiled
+	! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false false
+    fi
 
     pushd "${ROOT}/${ATF_PROJECT}"
     [[ "${clean}" == true ]] && clean_bl2 "${MTK_PLAT}"
