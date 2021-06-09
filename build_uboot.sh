@@ -19,9 +19,11 @@ function build_uboot {
     if [[ "${build_ab}" == true ]]; then
 	MTK_DEFCONFIG=$(config_value "$1" uboot.ab_defconfig)
 	UBOOT_OUT_BIN="${OUT}/${MTK_PLAT}/u-boot-ab.bin"
+	UBOOT_OUT_ENV="${OUT}/${MTK_PLAT}/u-boot-initial-env_ab"
     else
 	MTK_DEFCONFIG=$(config_value "$1" uboot.defconfig)
 	UBOOT_OUT_BIN="${OUT}/${MTK_PLAT}/u-boot.bin"
+	UBOOT_OUT_ENV="${OUT}/${MTK_PLAT}/u-boot-initial-env_noab"
     fi
 
     if [ -z "${MTK_DEFCONFIG}" ]; then
@@ -43,6 +45,8 @@ function build_uboot {
 
     make "${MTK_DEFCONFIG}"
     make -j$(nproc)
+
+    ./scripts/get_default_envs.sh > "${UBOOT_OUT_ENV}"
     cp u-boot.bin "${UBOOT_OUT_BIN}"
 
     unset ARCH
