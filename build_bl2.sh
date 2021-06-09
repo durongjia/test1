@@ -3,24 +3,22 @@
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/utils.sh"
 
-ATF_PRIVATE="${ROOT}/arm-trusted-firmware-private"
-
 function clean_bl2 {
     local MTK_PLAT="$1"
-    pushd "${ATF_PRIVATE}"
     [ -d "build/${MTK_PLAT}" ] && rm -r "build/${MTK_PLAT}"
-    popd
 }
 
 function build_bl2 {
     local MTK_PLAT=$(config_value "$1" plat)
+    local ATF_PROJECT=$(config_value "$1" bl2.project)
     local MTK_CFLAGS=$(config_value "$1" bl2.cflags)
 
     local clean="$2"
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
+
+    pushd "${ROOT}/${ATF_PROJECT}"
     [[ "${clean}" == true ]] && clean_bl2 "${MTK_PLAT}"
 
-    pushd "${ATF_PRIVATE}"
     aarch64_env
     make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" bl2
 

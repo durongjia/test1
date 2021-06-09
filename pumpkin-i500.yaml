@@ -1,6 +1,7 @@
 plat: mt8183
 
 bl2:
+  project: arm-trusted-firmware
   cflags: -DNEED_BL32
 
 libdram:
