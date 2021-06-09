@@ -7,6 +7,9 @@ bl2:
 libdram:
   board: mt8183-pumpkin
 
+lk:
+  board: mt8183-evb
+
 optee:
   flags: CFG_ARM64_core=y ta-targets=ta_arm64 CFG_DRAM_SIZE=0x80000000
 

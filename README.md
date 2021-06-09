@@ -30,6 +30,17 @@ Options:
   --clean    (OPTIONAL) clean before build
 ```
 
+## Build little kernel
+``` {.sh}
+usage: build_lk.sh [options]
+
+$ build_lk.sh --config=pumpkin-i500.yaml
+
+Options:
+  --config   Mediatek board config file
+  --clean    (OPTIONAL) clean before build
+```
+
 ## Build uboot
 ``` {.sh}
 usage: build_uboot.sh [options]

@@ -3,6 +3,7 @@
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/build_bl2.sh"
 source "${SRC}/build_fip.sh"
+source "${SRC}/build_lk.sh"
 source "${SRC}/build_optee.sh"
 source "${SRC}/build_uboot.sh"
 source "${SRC}/utils.sh"
@@ -12,6 +13,9 @@ function build_all {
 
     # bl2
     build_bl2 "$@"
+
+    # lk
+    build_lk "$@"
 
     # uboot
     build_uboot "$@"
