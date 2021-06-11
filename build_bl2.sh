@@ -17,7 +17,7 @@ function build_bl2 {
     local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}/src/${MTK_PLAT}/libdram.a"
     local clean="$2"
 
-    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
+    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
 
     if [[ "${clean}" == true ]]; then
 	build_libdram "$1" true false

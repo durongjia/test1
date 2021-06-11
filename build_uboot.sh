@@ -35,7 +35,7 @@ function build_uboot {
 	return
     fi
 
-    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
+    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
 
     pushd "${UBOOT}"
     [[ "${clean}" == true ]] && clean_uboot "${MTK_PLAT}"

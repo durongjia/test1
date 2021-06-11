@@ -14,7 +14,7 @@ function build_optee {
     local OPTEE_FLAGS=$(config_value "$1" optee.flags)
     local clean="$2"
 
-    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
+    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
 
     pushd "${OPTEE}"
     [[ "${clean}" == true ]] && clean_optee "${MTK_PLAT}"

@@ -19,7 +19,7 @@ function build_fip {
     local FIP_BIN="$4"
     local clean="$5"
 
-    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir "${OUT}/${MTK_PLAT}"
+    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
 
     pushd "${ATF}"
     [[ "${clean}" == true ]] && clean_fip "${MTK_PLAT}"
