@@ -20,3 +20,6 @@ uboot:
 fip:
   cflags: -DNEED_BL32
   log_level: 20
+
+android:
+  binaries_path: device/mediatek/common/soc/mt8183/binaries/images/

@@ -30,8 +30,10 @@ function build_all {
     fi
 
     if [ -e "${OUT}/${MTK_PLAT}/u-boot-ab.bin" ]; then
-	build_fip "$1" "${OUT}/${MTK_PLAT}/tee.bin" "${OUT}/${MTK_PLAT}/u-boot-ab.bin"  "fip_ab.bin"
+	build_fip "$1" "${OUT}/${MTK_PLAT}/tee.bin" "${OUT}/${MTK_PLAT}/u-boot-ab.bin" "fip_ab.bin"
     fi
 }
 
-main "$@"
+if [ "$0" = "$BASH_SOURCE" ]; then
+    main "$@"
+fi

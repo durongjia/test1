@@ -88,3 +88,14 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
 ```
+
+## Release Android
+``` {.sh}
+usage: release_android.sh [options]
+
+$ release_android.sh --aosp=/home/julien/Documents/mediatek/android
+
+Options:
+  --aosp     Android Root path
+  --clean    (OPTIONAL) clean before build
+```
