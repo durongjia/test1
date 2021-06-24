@@ -14,8 +14,8 @@ optee:
   flags: CFG_ARM64_core=y ta-targets=ta_arm64 CFG_DRAM_SIZE=0x80000000
 
 uboot:
-  defconfig: mt8183_evb_android_defconfig
-  ab_defconfig: mt8183_evb_android_ab_defconfig
+  defconfig: mt8183_pumpkin_android_defconfig
+  ab_defconfig: mt8183_pumpkin_android_ab_defconfig
 
 fip:
   cflags: -DNEED_BL32
