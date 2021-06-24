@@ -7,7 +7,13 @@ LIBDRAM="${ROOT}/libdram"
 
 function clean_libdram {
     local MTK_BUILD="$1"
+    local LIBDRAM_CONFIG="$2"
+
     [ -d "${MTK_BUILD}" ] && rm -r "${MTK_BUILD}"
+    if [ -e "${LIBDRAM_CONFIG}" ]; then
+        rm -r "boards/${MTK_BOARD}/"
+    fi
+
 }
 
 function build_libdram {
@@ -15,6 +21,7 @@ function build_libdram {
     local MTK_BUILD=""
     local clean="$2"
     local build_for_lk="$3"
+    local LIBDRAM_CONFIG="${SRC}/libdram_config/${MTK_BOARD}"
 
     if [[ "${build_for_lk}" == true ]]; then
         MTK_BUILD="build-${MTK_BOARD}-lk"
@@ -23,7 +30,12 @@ function build_libdram {
     fi
 
     pushd "${LIBDRAM}"
-    [[ "${clean}" == true ]] && clean_libdram "${MTK_BUILD}"
+    [[ "${clean}" == true ]] && clean_libdram "${MTK_BUILD}" "${LIBDRAM_CONFIG}"
+
+    if [ -e "${LIBDRAM_CONFIG}" ]; then
+        mkdir -p "boards/${MTK_BOARD}"
+        cp "${LIBDRAM_CONFIG}" "${LIBDRAM}/boards/${MTK_BOARD}/meson.build"
+    fi
 
     aarch64_env
     if [[ "${build_for_lk}" == true ]]; then
