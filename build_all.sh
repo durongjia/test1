@@ -12,6 +12,10 @@ function build_all {
     local MTK_PLAT=$(config_value "$1" plat)
     local clean="$2"
 
+
+    if [[ "${clean}" == true ]]; then
+    [ -d "${OUT}/${MTK_PLAT}" ] && rm -rf "${OUT}/${MTK_PLAT}"
+    fi
     # bl2
     build_bl2 "$@"
 
