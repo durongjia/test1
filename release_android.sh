@@ -80,15 +80,13 @@ DELIM__
 
 function main {
     local aosp
-    local clean=false
 
-    local OPTS=$(getopt -o '' -l aosp:,clean -- "$@")
+    local OPTS=$(getopt -o '' -l aosp: -- "$@")
     eval set -- "${OPTS}"
 
     while true; do
     case "$1" in
         --aosp) aosp=$(readlink -e "$2"); shift 2 ;;
-        --clean) clean=true; shift ;;
         --) shift; break ;;
         *) usage ;;
     esac
@@ -108,7 +106,7 @@ function main {
         MTK_PLAT=$(config_value "${MTK_CONFIG}" plat)
         MTK_BINARIES_PATH=$(config_value "${MTK_CONFIG}" android.binaries_path)
 
-        build_all "${MTK_CONFIG}" "${clean}"
+        build_all "${MTK_CONFIG}" "true"
         copy_binaries "${OUT}/${MTK_PLAT}/" "${aosp}/${MTK_BINARIES_PATH}"
     done
     popd
