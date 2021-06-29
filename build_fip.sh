@@ -26,7 +26,7 @@ function build_fip {
 
     arm-none_env
     make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" BL32="${BL32_BIN}" BL33="${BL33_BIN}" \
-	 SPD=opteed LOG_LEVEL=$LOG_LEVEL NEED_BL32=yes NEED_BL33=yes bl31 fip
+         SPD=opteed LOG_LEVEL=$LOG_LEVEL NEED_BL32=yes NEED_BL33=yes bl31 fip
     cp "build/${MTK_PLAT}/release/fip.bin" "${OUT}/${MTK_PLAT}/${FIP_BIN}"
 
     clear_vars
@@ -61,15 +61,15 @@ function main {
     eval set -- "${OPTS}"
 
     while true; do
-	case "$1" in
-	    --bl32) bl32=$(readlink -e "$2"); shift 2 ;;
-	    --bl33) bl33=$(readlink -e "$2"); shift 2 ;;
-	    --clean) clean=true; shift ;;
-	    --config) config=$(readlink -e "$2"); shift 2 ;;
-	    --output) output=$2; shift 2 ;;
-	    --) shift; break ;;
-	    *) usage; break ;;
-	esac
+    case "$1" in
+        --bl32) bl32=$(readlink -e "$2"); shift 2 ;;
+        --bl33) bl33=$(readlink -e "$2"); shift 2 ;;
+        --clean) clean=true; shift ;;
+        --config) config=$(readlink -e "$2"); shift 2 ;;
+        --output) output=$2; shift 2 ;;
+        --) shift; break ;;
+        *) usage; break ;;
+    esac
     done
 
     # check arguments

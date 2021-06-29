@@ -22,10 +22,10 @@ function aarch64_env {
 
 function check_aarch64 {
     if ! [ -d "${TOOLCHAINS}/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu" ]; then
-	pushd $TOOLCHAINS
-	wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
-	tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
-	popd
+    pushd $TOOLCHAINS
+    wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+    tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+    popd
     fi
 }
 
@@ -36,10 +36,10 @@ function arm-none_env {
 
 function check_arm-none {
     if ! [ -d "${TOOLCHAINS}/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu" ]; then
-	pushd $TOOLCHAINS
-	wget https://developer.arm.com/-/media/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz
-	tar -xvf gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz
-	popd
+        pushd $TOOLCHAINS
+        wget https://developer.arm.com/-/media/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz
+        tar -xvf gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz
+        popd
     fi
 }
 
@@ -86,12 +86,12 @@ function main {
     eval set -- "${OPTS}"
 
     while true; do
-	case "$1" in
-	    --config) config=$(readlink -e "$2"); shift 2 ;;
-	    --clean) clean=true; shift ;;
-	    --) shift; break ;;
-	    *) usage ;;
-	esac
+    case "$1" in
+        --config) config=$(readlink -e "$2"); shift 2 ;;
+        --clean) clean=true; shift ;;
+        --) shift; break ;;
+        *) usage ;;
+    esac
     done
 
     # check arguments

@@ -20,10 +20,10 @@ function build_bl2 {
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
 
     if [[ "${clean}" == true ]]; then
-	build_libdram "$1" true false
+        build_libdram "$1" true false
     else
-	# check if libdram has been compiled
-	! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false false
+        # check if libdram has been compiled
+        ! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false false
     fi
 
     pushd "${ROOT}/${ATF_PROJECT}"
@@ -37,7 +37,7 @@ function build_bl2 {
     truncate -s%4 bl2.img.tmp
 
     "${SRC}/mkimage" -T mtk_image -a 0x201000 -e 0x201000 -n "media=emmc;aarch64=1" \
-		     -d bl2.img.tmp bl2.img
+             -d bl2.img.tmp bl2.img
 
     rm bl2.img.tmp
     cp bl2.img "${OUT}/${MTK_PLAT}/"

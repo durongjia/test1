@@ -17,22 +17,22 @@ function build_uboot {
     local MTK_DEFCONFIG
     local UBOOT_OUT_BIN
     if [[ "${build_ab}" == true ]]; then
-	MTK_DEFCONFIG=$(config_value "$1" uboot.ab_defconfig)
-	UBOOT_OUT_BIN="${OUT}/${MTK_PLAT}/u-boot-ab.bin"
-	UBOOT_OUT_ENV="${OUT}/${MTK_PLAT}/u-boot-initial-env_ab"
+        MTK_DEFCONFIG=$(config_value "$1" uboot.ab_defconfig)
+        UBOOT_OUT_BIN="${OUT}/${MTK_PLAT}/u-boot-ab.bin"
+        UBOOT_OUT_ENV="${OUT}/${MTK_PLAT}/u-boot-initial-env_ab"
     else
-	MTK_DEFCONFIG=$(config_value "$1" uboot.defconfig)
-	UBOOT_OUT_BIN="${OUT}/${MTK_PLAT}/u-boot.bin"
-	UBOOT_OUT_ENV="${OUT}/${MTK_PLAT}/u-boot-initial-env_noab"
+        MTK_DEFCONFIG=$(config_value "$1" uboot.defconfig)
+        UBOOT_OUT_BIN="${OUT}/${MTK_PLAT}/u-boot.bin"
+        UBOOT_OUT_ENV="${OUT}/${MTK_PLAT}/u-boot-initial-env_noab"
     fi
 
     if [ -z "${MTK_DEFCONFIG}" ]; then
-	if [[ "${build_ab}" == true ]]; then
-	    echo "uboot: skip build, ab_defconfig not provided"
-	else
-	    echo "uboot: skip build, defconfig not provided"
-	fi
-	return
+        if [[ "${build_ab}" == true ]]; then
+            echo "uboot: skip build, ab_defconfig not provided"
+        else
+            echo "uboot: skip build, defconfig not provided"
+        fi
+    return
     fi
 
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
@@ -78,13 +78,13 @@ function main {
     eval set -- "${OPTS}"
 
     while true; do
-	case "$1" in
-	    --build_ab) build_ab=true; shift ;;
-	    --config) config=$(readlink -e "$2"); shift 2 ;;
-	    --clean) clean=true; shift ;;
-	    --) shift; break ;;
-	    *) usage ;;
-	esac
+    case "$1" in
+        --build_ab) build_ab=true; shift ;;
+        --config) config=$(readlink -e "$2"); shift 2 ;;
+        --clean) clean=true; shift ;;
+        --) shift; break ;;
+        *) usage ;;
+    esac
     done
 
     # check arguments

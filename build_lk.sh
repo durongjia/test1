@@ -21,10 +21,10 @@ function build_lk {
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
 
     if [[ "${clean}" == true ]]; then
-	build_libdram "$1" true true
+        build_libdram "$1" true true
     else
-	# check if libdram has been compiled
-	! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false true
+        # check if libdram has been compiled
+        ! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false true
     fi
 
     pushd "${LK}"
@@ -32,8 +32,8 @@ function build_lk {
 
     aarch64_env
     make ARCH_arm64_TOOLCHAIN_PREFIX=aarch64-linux-gnu- CFLAGS="" DEBUG=0 \
-	 GLOBAL_CFLAGS="-mstrict-align" SECURE_BOOT_ENABLE=no LIBGCC="" \
-	 LIBDRAM="${LIBDRAM_A}" "${MTK_BOARD}"
+         GLOBAL_CFLAGS="-mstrict-align" SECURE_BOOT_ENABLE=no LIBGCC="" \
+         LIBDRAM="${LIBDRAM_A}" "${MTK_BOARD}"
     cp "build-${MTK_BOARD}/lk.bin" "${OUT}/${MTK_PLAT}/"
 
     clear_vars

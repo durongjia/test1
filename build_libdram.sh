@@ -17,9 +17,9 @@ function build_libdram {
     local build_for_lk="$3"
 
     if [[ "${build_for_lk}" == true ]]; then
-	MTK_BUILD="build-${MTK_BOARD}-lk"
+        MTK_BUILD="build-${MTK_BOARD}-lk"
     else
-	MTK_BUILD="build-${MTK_BOARD}"
+        MTK_BUILD="build-${MTK_BOARD}"
     fi
 
     pushd "${LIBDRAM}"
@@ -27,9 +27,9 @@ function build_libdram {
 
     aarch64_env
     if [[ "${build_for_lk}" == true ]]; then
-	meson "${MTK_BUILD}" -Dboard="${MTK_BOARD}" -Dlk=true --cross-file meson.cross
+        meson "${MTK_BUILD}" -Dboard="${MTK_BOARD}" -Dlk=true --cross-file meson.cross
     else
-	meson "${MTK_BUILD}" -Dboard="${MTK_BOARD}" --cross-file meson.cross
+        meson "${MTK_BUILD}" -Dboard="${MTK_BOARD}" --cross-file meson.cross
     fi
     ninja -C "${MTK_BUILD}"
 
