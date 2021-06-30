@@ -4,7 +4,7 @@ Scripts to build various bootloaders (A-TF, U-Boot, OP-TEE) for MediaTek AIoT
 
 Dependencies:
 ``` {.sh}
-$ sudo apt install bc bison build-essential curl flex git libssl-dev python3 python3-pip wget -y
+$ sudo apt install bc bison build-essential curl flex git libssl-dev python3 python3-pip meson wget -y
 $ pip3 install pycryptodome pyelftools shyaml --user
 ```
 
