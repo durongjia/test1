@@ -97,5 +97,4 @@ $ release_android.sh --aosp=/home/julien/Documents/mediatek/android
 
 Options:
   --aosp     Android Root path
-  --clean    (OPTIONAL) clean before build
 ```
