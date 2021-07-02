@@ -35,7 +35,7 @@ function build_fip {
 
 # main
 function usage {
-      cat <<DELIM__
+    cat <<DELIM__
 usage: $(basename $0) [options]
 
 $ $(basename $0) --config=pumpkin-i500.yaml --bl32=tee.bin --bl33=u-boot.bin --output=fip-test.bin
@@ -61,15 +61,15 @@ function main {
     eval set -- "${OPTS}"
 
     while true; do
-    case "$1" in
-        --bl32) bl32=$(readlink -e "$2"); shift 2 ;;
-        --bl33) bl33=$(readlink -e "$2"); shift 2 ;;
-        --clean) clean=true; shift ;;
-        --config) config=$(readlink -e "$2"); shift 2 ;;
-        --output) output=$2; shift 2 ;;
-        --) shift; break ;;
-        *) usage; break ;;
-    esac
+        case "$1" in
+            --bl32) bl32=$(readlink -e "$2"); shift 2 ;;
+            --bl33) bl33=$(readlink -e "$2"); shift 2 ;;
+            --clean) clean=true; shift ;;
+            --config) config=$(readlink -e "$2"); shift 2 ;;
+            --output) output=$2; shift 2 ;;
+            --) shift; break ;;
+            *) usage; break ;;
+        esac
     done
 
     # check arguments

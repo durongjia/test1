@@ -32,7 +32,7 @@ function build_uboot {
         else
             echo "uboot: skip build, defconfig not provided"
         fi
-    return
+        return
     fi
 
     ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
@@ -56,7 +56,7 @@ function build_uboot {
 
 # main
 function usage {
-      cat <<DELIM__
+    cat <<DELIM__
 usage: $(basename $0) [options]
 
 $ $(basename $0) --config=pumpkin-i500.yaml --build_ab
@@ -78,13 +78,13 @@ function main {
     eval set -- "${OPTS}"
 
     while true; do
-    case "$1" in
-        --build_ab) build_ab=true; shift ;;
-        --config) config=$(readlink -e "$2"); shift 2 ;;
-        --clean) clean=true; shift ;;
-        --) shift; break ;;
-        *) usage ;;
-    esac
+        case "$1" in
+            --build_ab) build_ab=true; shift ;;
+            --config) config=$(readlink -e "$2"); shift 2 ;;
+            --clean) clean=true; shift ;;
+            --) shift; break ;;
+            *) usage ;;
+        esac
     done
 
     # check arguments

@@ -22,10 +22,10 @@ function aarch64_env {
 
 function check_aarch64 {
     if ! [ -d "${TOOLCHAINS}/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu" ]; then
-    pushd $TOOLCHAINS
-    wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
-    tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
-    popd
+        pushd $TOOLCHAINS
+        wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+        tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+        popd
     fi
 }
 
@@ -64,7 +64,7 @@ function config_value {
 }
 
 function usage {
-      cat <<DELIM__
+    cat <<DELIM__
 usage: $(basename $0) [options]
 
 $ $(basename $0) --config=pumpkin-i500.yaml
@@ -86,12 +86,12 @@ function main {
     eval set -- "${OPTS}"
 
     while true; do
-    case "$1" in
-        --config) config=$(readlink -e "$2"); shift 2 ;;
-        --clean) clean=true; shift ;;
-        --) shift; break ;;
-        *) usage ;;
-    esac
+        case "$1" in
+            --config) config=$(readlink -e "$2"); shift 2 ;;
+            --clean) clean=true; shift ;;
+            --) shift; break ;;
+            *) usage ;;
+        esac
     done
 
     # check arguments

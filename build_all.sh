@@ -14,8 +14,9 @@ function build_all {
 
 
     if [[ "${clean}" == true ]]; then
-    [ -d "${OUT}/${MTK_PLAT}" ] && rm -rf "${OUT}/${MTK_PLAT}"
+        [ -d "${OUT}/${MTK_PLAT}" ] && rm -rf "${OUT}/${MTK_PLAT}"
     fi
+
     # bl2
     build_bl2 "$@"
 
@@ -32,12 +33,12 @@ function build_all {
     # fip
     if [ -e "${OUT}/${MTK_PLAT}/u-boot.bin" ]; then
         build_fip "$1" "${OUT}/${MTK_PLAT}/tee.bin" "${OUT}/${MTK_PLAT}/u-boot.bin" \
-            "fip_noab.bin" "${clean}"
+                  "fip_noab.bin" "${clean}"
     fi
 
     if [ -e "${OUT}/${MTK_PLAT}/u-boot-ab.bin" ]; then
         build_fip "$1" "${OUT}/${MTK_PLAT}/tee.bin" "${OUT}/${MTK_PLAT}/u-boot-ab.bin" \
-              "fip_ab.bin" "${clean}"
+                  "fip_ab.bin" "${clean}"
     fi
 }
 

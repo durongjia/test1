@@ -4,19 +4,19 @@ SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/build_all.sh"
 
 PROJECTS=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
-      "build" "libdram" "lk" "optee-os" "u-boot")
+          "build" "libdram" "lk" "optee-os" "u-boot")
 
 function check_local_changes {
-   local STATUS
+    local STATUS
 
-   for PROJECT in "${PROJECTS[@]}"; do
-    pushd "${ROOT}/${PROJECT}"
-    if ! $(git diff-index --quiet HEAD); then
-        echo "Local changes detected in: ${PROJECT}"
-        exit 1
-    fi
-    popd
-   done
+    for PROJECT in "${PROJECTS[@]}"; do
+        pushd "${ROOT}/${PROJECT}"
+        if ! $(git diff-index --quiet HEAD); then
+            echo "Local changes detected in: ${PROJECT}"
+            exit 1
+        fi
+        popd
+    done
 }
 
 function display_commit_msg_header {
@@ -58,7 +58,7 @@ function copy_binaries {
     local MTK_OUT="$1"
     local MTK_ANDROID_OUT="$2"
     local BINARIES=("bl2.img" "fip_ab.bin" "fip_noab.bin" "lk.bin"
-            "u-boot-initial-env_ab" "u-boot-initial-env_noab")
+                    "u-boot-initial-env_ab" "u-boot-initial-env_noab")
 
     for BINARY in "${BINARIES[@]}"; do
         cp "${MTK_OUT}${BINARY}" "${MTK_ANDROID_OUT}"
@@ -84,11 +84,11 @@ function main {
     eval set -- "${OPTS}"
 
     while true; do
-    case "$1" in
-        --aosp) aosp=$(readlink -e "$2"); shift 2 ;;
-        --) shift; break ;;
-        *) usage ;;
-    esac
+        case "$1" in
+            --aosp) aosp=$(readlink -e "$2"); shift 2 ;;
+            --) shift; break ;;
+            *) usage ;;
+        esac
     done
 
     # check arguments

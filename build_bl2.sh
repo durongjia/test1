@@ -37,7 +37,7 @@ function build_bl2 {
     truncate -s%4 bl2.img.tmp
 
     "${SRC}/mkimage" -T mtk_image -a 0x201000 -e 0x201000 -n "media=emmc;aarch64=1" \
-             -d bl2.img.tmp bl2.img
+                     -d bl2.img.tmp bl2.img
 
     rm bl2.img.tmp
     cp bl2.img "${OUT}/${MTK_PLAT}/"
