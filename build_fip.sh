@@ -14,12 +14,13 @@ function build_fip {
     local MTK_PLAT=$(config_value "$1" plat)
     local MTK_CFLAGS=$(config_value "$1" fip.cflags)
     local LOG_LEVEL=$(config_value "$1" fip.log_level)
+    local OUT_DIR=$(out_dir $1)
     local BL32_BIN="$2"
     local BL33_BIN="$3"
     local FIP_BIN="$4"
     local clean="$5"
 
-    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
+    ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 
     pushd "${ATF}"
     [[ "${clean}" == true ]] && clean_fip "${MTK_PLAT}"
@@ -27,7 +28,7 @@ function build_fip {
     arm-none_env
     make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" BL32="${BL32_BIN}" BL33="${BL33_BIN}" \
          SPD=opteed LOG_LEVEL=$LOG_LEVEL NEED_BL32=yes NEED_BL33=yes bl31 fip
-    cp "build/${MTK_PLAT}/release/fip.bin" "${OUT}/${MTK_PLAT}/${FIP_BIN}"
+    cp "build/${MTK_PLAT}/release/fip.bin" "${OUT_DIR}/${FIP_BIN}"
 
     clear_vars
     popd

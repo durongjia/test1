@@ -10,11 +10,12 @@ source "${SRC}/utils.sh"
 
 function build_all {
     local MTK_PLAT=$(config_value "$1" plat)
+    local OUT_DIR=$(out_dir $1)
     local clean="$2"
 
 
     if [[ "${clean}" == true ]]; then
-        [ -d "${OUT}/${MTK_PLAT}" ] && rm -rf "${OUT}/${MTK_PLAT}"
+        [ -d "${OUT_DIR}" ] && rm -rf "${OUT_DIR}"
     fi
 
     # bl2
@@ -31,13 +32,13 @@ function build_all {
     build_optee "$@"
 
     # fip
-    if [ -e "${OUT}/${MTK_PLAT}/u-boot.bin" ]; then
-        build_fip "$1" "${OUT}/${MTK_PLAT}/tee.bin" "${OUT}/${MTK_PLAT}/u-boot.bin" \
+    if [ -e "${OUT_DIR}/u-boot.bin" ]; then
+        build_fip "$1" "${OUT_DIR}/tee.bin" "${OUT_DIR}/u-boot.bin" \
                   "fip_noab.bin" "${clean}"
     fi
 
-    if [ -e "${OUT}/${MTK_PLAT}/u-boot-ab.bin" ]; then
-        build_fip "$1" "${OUT}/${MTK_PLAT}/tee.bin" "${OUT}/${MTK_PLAT}/u-boot-ab.bin" \
+    if [ -e "${OUT_DIR}/u-boot-ab.bin" ]; then
+        build_fip "$1" "${OUT_DIR}/tee.bin" "${OUT_DIR}/u-boot-ab.bin" \
                   "fip_ab.bin" "${clean}"
     fi
 }

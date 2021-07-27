@@ -14,10 +14,11 @@ function build_bl2 {
     local ATF_PROJECT=$(config_value "$1" bl2.project)
     local MTK_CFLAGS=$(config_value "$1" bl2.cflags)
     local MTK_LIBDRAM_BOARD=$(config_value "$1" libdram.board)
+    local OUT_DIR=$(out_dir $1)
     local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}/src/${MTK_PLAT}/libdram.a"
     local clean="$2"
 
-    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
+    ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 
     if [[ "${clean}" == true ]]; then
         build_libdram "$1" true false
@@ -40,7 +41,7 @@ function build_bl2 {
                      -d bl2.img.tmp bl2.img
 
     rm bl2.img.tmp
-    cp bl2.img "${OUT}/${MTK_PLAT}/"
+    cp bl2.img "${OUT_DIR}/"
     popd
 
     clear_vars

@@ -15,10 +15,11 @@ function build_lk {
     local MTK_PLAT=$(config_value "$1" plat)
     local MTK_BOARD=$(config_value "$1" lk.board)
     local MTK_LIBDRAM_BOARD=$(config_value "$1" libdram.board)
+    local OUT_DIR=$(out_dir $1)
     local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}-lk/src/${MTK_PLAT}/libdram.a"
     local clean="$2"
 
-    ! [ -d "${OUT}/${MTK_PLAT}" ] && mkdir -p "${OUT}/${MTK_PLAT}"
+    ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 
     if [[ "${clean}" == true ]]; then
         build_libdram "$1" true true
@@ -34,7 +35,7 @@ function build_lk {
     make ARCH_arm64_TOOLCHAIN_PREFIX=aarch64-linux-gnu- CFLAGS="" DEBUG=0 \
          GLOBAL_CFLAGS="-mstrict-align" SECURE_BOOT_ENABLE=no LIBGCC="" \
          LIBDRAM="${LIBDRAM_A}" "${MTK_BOARD}"
-    cp "build-${MTK_BOARD}/lk.bin" "${OUT}/${MTK_PLAT}/"
+    cp "build-${MTK_BOARD}/lk.bin" "${OUT_DIR}/"
 
     clear_vars
     popd

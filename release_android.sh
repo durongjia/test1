@@ -97,6 +97,7 @@ function main {
     # build all configs
     local MTK_PLAT
     local MTK_BINARIES_PATH
+    local OUT_DIR
 
     check_local_changes
 
@@ -104,11 +105,12 @@ function main {
     for MTK_CONFIG in $(ls *.yaml); do
         MTK_PLAT=$(config_value "${MTK_CONFIG}" plat)
         MTK_BINARIES_PATH=$(config_value "${MTK_CONFIG}" android.binaries_path)
+        OUT_DIR=$(out_dir "${MTK_CONFIG}")
 
         echo "-> Build: ${MTK_CONFIG}"
         build_all "${MTK_CONFIG}" "true"
         if [ -d "${aosp}/${MTK_BINARIES_PATH}" ]; then
-            copy_binaries "${OUT}/${MTK_PLAT}/" "${aosp}/${MTK_BINARIES_PATH}"
+            copy_binaries "${OUT_DIR}/" "${aosp}/${MTK_BINARIES_PATH}"
         else
             echo "ERROR: cannot copy binaries, ${aosp}/${MTK_BINARIES_PATH} not found"
             exit 1

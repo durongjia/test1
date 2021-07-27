@@ -63,6 +63,11 @@ function config_value {
     cat "$1" | shyaml --quiet get-value "$2"
 }
 
+function out_dir {
+    local yaml_config=$(basename $1)
+    echo "${OUT}/${yaml_config%.yaml}"
+}
+
 function usage {
     cat <<DELIM__
 usage: $(basename $0) [options]
