@@ -34,7 +34,7 @@ function build_libdram {
 
     if [ -e "${LIBDRAM_CONFIG}" ]; then
         mkdir -p "boards/${MTK_BOARD}"
-        cp "${LIBDRAM_CONFIG}" "${LIBDRAM}/boards/${MTK_BOARD}/meson.build"
+        cp "${LIBDRAM_CONFIG}" "boards/${MTK_BOARD}/meson.build"
     fi
 
     aarch64_env
