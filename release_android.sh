@@ -105,6 +105,7 @@ function main {
         MTK_PLAT=$(config_value "${MTK_CONFIG}" plat)
         MTK_BINARIES_PATH=$(config_value "${MTK_CONFIG}" android.binaries_path)
 
+        echo "-> Build: ${MTK_CONFIG}"
         build_all "${MTK_CONFIG}" "true"
         copy_binaries "${OUT}/${MTK_PLAT}/" "${aosp}/${MTK_BINARIES_PATH}"
     done
