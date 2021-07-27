@@ -107,7 +107,12 @@ function main {
 
         echo "-> Build: ${MTK_CONFIG}"
         build_all "${MTK_CONFIG}" "true"
-        copy_binaries "${OUT}/${MTK_PLAT}/" "${aosp}/${MTK_BINARIES_PATH}"
+        if [ -d "${aosp}/${MTK_BINARIES_PATH}" ]; then
+            copy_binaries "${OUT}/${MTK_PLAT}/" "${aosp}/${MTK_BINARIES_PATH}"
+        else
+            echo "ERROR: cannot copy binaries, ${aosp}/${MTK_BINARIES_PATH} not found"
+            exit 1
+        fi
     done
     popd
 
