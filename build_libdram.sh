@@ -7,7 +7,8 @@ LIBDRAM="${ROOT}/libdram"
 
 function clean_libdram {
     local MTK_BUILD="$1"
-    local LIBDRAM_CONFIG="$2"
+    local MTK_BOARD="$2"
+    local LIBDRAM_CONFIG="$3"
 
     [ -d "${MTK_BUILD}" ] && rm -r "${MTK_BUILD}"
     if [ -e "${LIBDRAM_CONFIG}" ]; then
@@ -30,7 +31,7 @@ function build_libdram {
     fi
 
     pushd "${LIBDRAM}"
-    [[ "${clean}" == true ]] && clean_libdram "${MTK_BUILD}" "${LIBDRAM_CONFIG}"
+    [[ "${clean}" == true ]] && clean_libdram "${MTK_BUILD}" "${MTK_BOARD}" "${LIBDRAM_CONFIG}"
 
     if [ -e "${LIBDRAM_CONFIG}" ]; then
         mkdir -p "boards/${MTK_BOARD}"
