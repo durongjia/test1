@@ -11,10 +11,9 @@ function clean_libdram {
     local LIBDRAM_CONFIG="$3"
 
     [ -d "${MTK_BUILD}" ] && rm -r "${MTK_BUILD}"
-    if [ -e "${LIBDRAM_CONFIG}" ]; then
+    if [ -e "${LIBDRAM_CONFIG}" ] && [ -d "boards/${MTK_BOARD}/" ]; then
         rm -r "boards/${MTK_BOARD}/"
     fi
-
 }
 
 function build_libdram {
