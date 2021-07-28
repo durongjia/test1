@@ -11,7 +11,7 @@ lk:
   board: mt8183-evb
 
 optee:
-  flags: CFG_ARM64_core=y ta-targets=ta_arm64 CFG_DRAM_SIZE=0x80000000
+  flags: CFG_ARM64_core=y ta-targets=ta_arm64 CFG_DRAM_SIZE=0x80000000 CFG_CORE_HEAP_SIZE=131072
 
 uboot:
   defconfig: mt8183_pumpkin_android_defconfig
