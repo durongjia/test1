@@ -3,8 +3,9 @@
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/build_all.sh"
 
-PROJECTS=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
-          "build" "libdram" "lk" "optee-os" "u-boot")
+PROJECTS_AIOT=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
+               "libdram" "lk" "optee-os" "u-boot")
+PROJECTS_RICH_IOT=("build")
 
 function check_local_changes {
     local STATUS
@@ -31,9 +32,8 @@ function display_commit_msg_header {
 }
 
 function display_commit_msg {
-    display_commit_msg_header
-    printf "soc: mt8167/mt8183: update binaries\n\n"
-    printf "This update contains following changes:\nXXXX\n\n"
+    local REMOTE_NAME=$1 && shift
+    local PROJECTS=($@)
 
     local REMOTE_URL
     local HEAD
@@ -42,7 +42,7 @@ function display_commit_msg {
         pushd "${ROOT}/${PROJECT}"
         printf "%s Project: ${PROJECT}:\n" "-"
 
-        REMOTE_URL=$(git remote get-url rich-iot)
+        REMOTE_URL=$(git remote get-url ${REMOTE_NAME})
         printf "URL: ${REMOTE_URL}\n"
 
         BRANCH=$(repo info . 2>&1 | perl -ne 'print "$1" if /^Manifest revision: (.*)/')
@@ -118,7 +118,13 @@ function main {
     done
     popd
 
-    display_commit_msg
+    # display commit message
+    display_commit_msg_header
+    printf "soc: mt8167/mt8183: update binaries\n\n"
+    printf "This update contains following changes:\nXXXX\n\n"
+
+    display_commit_msg "aiot" "${PROJECTS_AIOT[@]}"
+    display_commit_msg "rich-iot" "${PROJECTS_RICH_IOT[@]}"
 }
 
 main "$@"
