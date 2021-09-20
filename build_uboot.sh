@@ -9,7 +9,7 @@ source "${SRC}/utils.sh"
 UBOOT="${ROOT}/u-boot"
 
 function clean_uboot {
-    make clean
+    make mrproper
 }
 
 function build_uboot {
