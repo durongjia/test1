@@ -24,7 +24,7 @@ function build_libdram {
     local MTK_BUILD=""
     local clean="${2:-false}"
     local build_for_lk="$3"
-    local LIBDRAM_CONFIG="${SRC}/libdram_config/${MTK_BOARD}"
+    local LIBDRAM_CONFIG="${SRC}/config/libdram/${MTK_BOARD}"
 
     if [[ "${build_for_lk}" == true ]]; then
         MTK_BUILD="build-${MTK_BOARD}-lk"

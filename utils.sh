@@ -72,7 +72,7 @@ function usage {
     cat <<DELIM__
 usage: $(basename $0) [options]
 
-$ $(basename $0) --config=pumpkin-i500.yaml
+$ $(basename $0) --config=i500-pumpkin.yaml
 
 Options:
   --config   Mediatek board config file

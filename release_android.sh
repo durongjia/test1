@@ -105,7 +105,7 @@ function main {
     check_local_changes
 
     pushd "${SRC}"
-    for MTK_CONFIG in $(ls *.yaml); do
+    for MTK_CONFIG in $(ls config/boards/*.yaml); do
         MTK_PLAT=$(config_value "${MTK_CONFIG}" plat)
         MTK_BINARIES_PATH=$(config_value "${MTK_CONFIG}" android.binaries_path)
         OUT_DIR=$(out_dir "${MTK_CONFIG}")
