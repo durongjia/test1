@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -u
+set -o pipefail
 
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/utils.sh"
@@ -7,7 +10,9 @@ ATF="${ROOT}/arm-trusted-firmware"
 
 function clean_fip {
     local MTK_PLAT="$1"
-    [ -d "build/${MTK_PLAT}" ] && rm -r "build/${MTK_PLAT}"
+    if [ -d "build/${MTK_PLAT}" ]; then
+        rm -r "build/${MTK_PLAT}"
+    fi
 }
 
 function build_fip {
@@ -18,7 +23,7 @@ function build_fip {
     local BL32_BIN="$2"
     local BL33_BIN="$3"
     local FIP_BIN="$4"
-    local clean="$5"
+    local clean="${5:-false}"
 
     ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 

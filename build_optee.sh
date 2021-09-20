@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/bin/bash 
+set -e
+set -u
+set -o pipefail
 
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/utils.sh"
@@ -6,7 +9,9 @@ source "${SRC}/utils.sh"
 OPTEE="${ROOT}/optee-os"
 
 function clean_optee {
-    [ -d "out" ] && rm -rf out
+    if [ -d "out" ]; then
+        rm -rf out
+    fi
 }
 
 function build_optee {
@@ -14,7 +19,7 @@ function build_optee {
     local OPTEE_FLAGS=$(config_value "$1" optee.flags)
     local OPTEE_BOARD=$(config_value "$1" optee.board)
     local OUT_DIR=$(out_dir $1)
-    local clean="$2"
+    local clean="${2:-false}"
 
     ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 

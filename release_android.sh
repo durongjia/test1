@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -u
+set -o pipefail
 
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/build_all.sh"

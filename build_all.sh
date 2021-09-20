@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -u
+set -o pipefail
 
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/build_bl2.sh"
@@ -11,7 +14,7 @@ source "${SRC}/utils.sh"
 function build_all {
     local MTK_PLAT=$(config_value "$1" plat)
     local OUT_DIR=$(out_dir $1)
-    local clean="$2"
+    local clean="${2:-false}"
 
 
     if [[ "${clean}" == true ]]; then

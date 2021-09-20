@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -u
+set -o pipefail
 
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/utils.sh"
@@ -12,8 +15,8 @@ function clean_uboot {
 function build_uboot {
     local MTK_PLAT=$(config_value "$1" plat)
     local OUT_DIR=$(out_dir $1)
-    local build_ab="$3"
-    local clean="$2"
+    local clean="${2:-false}"
+    local build_ab="${3:-false}"
 
     local MTK_DEFCONFIG
     local UBOOT_OUT_BIN

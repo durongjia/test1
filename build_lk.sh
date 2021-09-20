@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -u
+set -o pipefail
 
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/utils.sh"
@@ -8,7 +11,9 @@ LK="${ROOT}/lk"
 
 function clean_lk {
     local MTK_BOARD="$1"
-    [ -d "build-${MTK_BOARD}" ] && rm -r "build-${MTK_BOARD}"
+    if [ -d "build-${MTK_BOARD}" ]; then
+        rm -r "build-${MTK_BOARD}"
+    fi
 }
 
 function build_lk {
@@ -17,7 +22,7 @@ function build_lk {
     local MTK_LIBDRAM_BOARD=$(config_value "$1" libdram.board)
     local OUT_DIR=$(out_dir $1)
     local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}-lk/src/${MTK_PLAT}/libdram.a"
-    local clean="$2"
+    local clean="${2:-false}"
 
     ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 
@@ -29,7 +34,9 @@ function build_lk {
     fi
 
     pushd "${LK}"
-    [[ "${clean}" == true ]] && clean_lk "${MTK_BOARD}"
+    if [[ "${clean}" == true ]]; then
+        clean_lk "${MTK_BOARD}"
+    fi
 
     aarch64_env
     make ARCH_arm64_TOOLCHAIN_PREFIX=aarch64-linux-gnu- CFLAGS="" DEBUG=0 \

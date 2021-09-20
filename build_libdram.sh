@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -u
+set -o pipefail
 
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/utils.sh"
@@ -19,7 +22,7 @@ function clean_libdram {
 function build_libdram {
     local MTK_BOARD=$(config_value "$1" libdram.board)
     local MTK_BUILD=""
-    local clean="$2"
+    local clean="${2:-false}"
     local build_for_lk="$3"
     local LIBDRAM_CONFIG="${SRC}/libdram_config/${MTK_BOARD}"
 

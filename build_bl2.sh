@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -u
+set -o pipefail
 
 SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/utils.sh"
@@ -6,7 +9,9 @@ source "${SRC}/build_libdram.sh"
 
 function clean_bl2 {
     local MTK_PLAT="$1"
-    [ -d "build/${MTK_PLAT}" ] && rm -r "build/${MTK_PLAT}"
+    if [ -d "build/${MTK_PLAT}" ]; then
+        rm -r "build/${MTK_PLAT}"
+    fi
 }
 
 function build_bl2 {
@@ -16,7 +21,7 @@ function build_bl2 {
     local MTK_LIBDRAM_BOARD=$(config_value "$1" libdram.board)
     local OUT_DIR=$(out_dir $1)
     local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}/src/${MTK_PLAT}/libdram.a"
-    local clean="$2"
+    local clean="${2:-false}"
 
     ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 
@@ -28,7 +33,9 @@ function build_bl2 {
     fi
 
     pushd "${ROOT}/${ATF_PROJECT}"
-    [[ "${clean}" == true ]] && clean_bl2 "${MTK_PLAT}"
+    if [[ "${clean}" == true ]]; then
+        clean_bl2 "${MTK_PLAT}"
+    fi
 
     aarch64_env
     make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" LIBDRAM="${LIBDRAM_A}" bl2
