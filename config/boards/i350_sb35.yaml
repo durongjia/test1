@@ -23,4 +23,4 @@ fip:
   log_level: 20
 
 android:
-  binaries_path: device/mediatek/common/mt8365/binaries/images/
+  binaries_path: device/mediatek/board/i350_sb35/binaries/images/
