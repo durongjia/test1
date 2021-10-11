@@ -19,11 +19,21 @@ function build_fip {
     local MTK_PLAT=$(config_value "$1" plat)
     local MTK_CFLAGS=$(config_value "$1" fip.cflags)
     local LOG_LEVEL=$(config_value "$1" fip.log_level)
-    local OUT_DIR=$(out_dir $1)
     local BL32_BIN="$2"
     local BL33_BIN="$3"
     local FIP_BIN="$4"
     local clean="${5:-false}"
+    local EXTRA_FLAGS=""
+    local MODE="${6:-release}"
+    local OUT_DIR=$(out_dir $1 $MODE)
+
+    echo "--------------------> MODE: ${MODE} <--------------------"
+
+    if [[ "${MODE}" == "debug" ]]; then
+        EXTRA_FLAGS="${EXTRA_FLAGS} DEBUG=1 LOG_LEVEL=${LOG_LEVEL} ENABLE_LTO=1"
+    else
+        EXTRA_FLAGS="${EXTRA_FLAGS} DEBUG=0 LOG_LEVEL=0"
+    fi
 
     ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 
@@ -31,9 +41,10 @@ function build_fip {
     [[ "${clean}" == true ]] && clean_fip "${MTK_PLAT}"
 
     arm-none_env
-    make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" BL32="${BL32_BIN}" BL33="${BL33_BIN}" \
-         SPD=opteed LOG_LEVEL=$LOG_LEVEL NEED_BL32=yes NEED_BL33=yes bl31 fip
-    cp "build/${MTK_PLAT}/release/fip.bin" "${OUT_DIR}/${FIP_BIN}"
+    make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" BL32="${BL32_BIN}" BL33="${BL33_BIN}" ${EXTRA_FLAGS} \
+         SPD=opteed NEED_BL32=yes NEED_BL33=yes bl31 fip
+
+    cp "build/${MTK_PLAT}/${MODE}/fip.bin" "${OUT_DIR}/${FIP_BIN}"
 
     clear_vars
     popd
@@ -52,18 +63,20 @@ Options:
   --bl33     Path to bl33 binary
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 DELIM__
     exit 1
 }
 
 function main {
-    local bl32
-    local bl33
-    local config
+    local bl32=""
+    local bl33=""
+    local config=""
     local clean=false
-    local output
+    local output=""
+    local mode=""
 
-    local OPTS=$(getopt -o '' -l bl32:,bl33:,clean,config:,output: -- "$@")
+    local OPTS=$(getopt -o '' -l bl32:,bl33:,clean,config:,output:,debug -- "$@")
     eval set -- "${OPTS}"
 
     while true; do
@@ -73,6 +86,7 @@ function main {
             --clean) clean=true; shift ;;
             --config) config=$(readlink -e "$2"); shift 2 ;;
             --output) output=$2; shift 2 ;;
+            --debug) mode=debug; shift ;;
             --) shift; break ;;
             *) usage; break ;;
         esac
@@ -86,7 +100,7 @@ function main {
 
     # build fip
     check_env
-    build_fip "${config}" "${bl32}" "${bl33}" "${output}" "${clean}"
+    build_fip "${config}" "${bl32}" "${bl33}" "${output}" "${clean}" "${mode}"
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then

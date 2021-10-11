@@ -59,8 +59,9 @@ function display_commit_msg {
 function copy_binaries {
     local MTK_OUT="$1"
     local MTK_ANDROID_OUT="$2"
-    local BINARIES=("bl2.img" "fip_ab.bin" "fip_noab.bin" "lk.bin"
-                    "u-boot-initial-env_ab" "u-boot-initial-env_noab")
+    local MODE=$4
+    local BINARIES=("bl2-${MODE}.img" "fip_${MODE}_ab.bin" "fip_${MODE}_noab.bin" "lk-${MODE}.bin"
+                    "u-boot-initial-${MODE}-env_ab" "u-boot-initial-${MODE}-env_noab")
 
     for BINARY in "${BINARIES[@]}"; do
         cp "${MTK_OUT}${BINARY}" "${MTK_ANDROID_OUT}"
@@ -81,7 +82,10 @@ DELIM__
 
 function main {
     local aosp
-
+    local mode_list=(
+        debug
+        release
+        )
     local OPTS=$(getopt -o '' -l aosp: -- "$@")
     eval set -- "${OPTS}"
 
@@ -104,19 +108,22 @@ function main {
     check_local_changes
 
     pushd "${SRC}"
-    for MTK_CONFIG in $(ls config/boards/*.yaml); do
-        MTK_PLAT=$(config_value "${MTK_CONFIG}" plat)
-        MTK_BINARIES_PATH=$(config_value "${MTK_CONFIG}" android.binaries_path)
-        OUT_DIR=$(out_dir "${MTK_CONFIG}")
+    for MODE in "${mode_list[@]}"; do
+        echo "----------------> Build: ${MODE} <----------------"
+        for MTK_CONFIG in $(ls config/boards/*.yaml); do
+            MTK_PLAT=$(config_value "${MTK_CONFIG}" plat)
+            MTK_BINARIES_PATH=$(config_value "${MTK_CONFIG}" android.binaries_path)
+            OUT_DIR=$(out_dir "${MTK_CONFIG}" "${MODE}")
 
-        echo "-> Build: ${MTK_CONFIG}"
-        build_all "${MTK_CONFIG}" "true"
-        if [ -d "${aosp}/${MTK_BINARIES_PATH}" ]; then
-            copy_binaries "${OUT_DIR}/" "${aosp}/${MTK_BINARIES_PATH}"
-        else
-            echo "ERROR: cannot copy binaries, ${aosp}/${MTK_BINARIES_PATH} not found"
-            exit 1
-        fi
+            echo "-> Build: ${MTK_CONFIG}"
+            build_all "${MTK_CONFIG}" "true" "${MODE}"
+            if [ -d "${aosp}/${MTK_BINARIES_PATH}" ]; then
+                copy_binaries "${OUT_DIR}/" "${aosp}/${MTK_BINARIES_PATH}" "${MTK_CONFIG}" "${MODE}"
+            else
+                echo "ERROR: cannot copy binaries, ${aosp}/${MTK_BINARIES_PATH} not found"
+                exit 1
+            fi
+        done
     done
     popd
 

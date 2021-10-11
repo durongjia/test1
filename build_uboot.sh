@@ -14,20 +14,23 @@ function clean_uboot {
 
 function build_uboot {
     local MTK_PLAT=$(config_value "$1" plat)
-    local OUT_DIR=$(out_dir $1)
     local clean="${2:-false}"
     local build_ab="${3:-false}"
+    local MODE="${4:-release}"
+    local OUT_DIR=$(out_dir $1 $MODE)
+
+    echo "--------------------> FORCE MODE: ${MODE} <--------------------"
 
     local MTK_DEFCONFIG
     local UBOOT_OUT_BIN
     if [[ "${build_ab}" == true ]]; then
         MTK_DEFCONFIG=$(config_value "$1" uboot.ab_defconfig)
-        UBOOT_OUT_BIN="${OUT_DIR}/u-boot-ab.bin"
-        UBOOT_OUT_ENV="${OUT_DIR}/u-boot-initial-env_ab"
+        UBOOT_OUT_BIN="${OUT_DIR}/u-boot-${MODE}-ab.bin"
+        UBOOT_OUT_ENV="${OUT_DIR}/u-boot-initial-${MODE}-env_ab"
     else
         MTK_DEFCONFIG=$(config_value "$1" uboot.defconfig)
-        UBOOT_OUT_BIN="${OUT_DIR}/u-boot.bin"
-        UBOOT_OUT_ENV="${OUT_DIR}/u-boot-initial-env_noab"
+        UBOOT_OUT_BIN="${OUT_DIR}/u-boot-${MODE}.bin"
+        UBOOT_OUT_ENV="${OUT_DIR}/u-boot-initial-${MODE}-env_noab"
     fi
 
     if [ -z "${MTK_DEFCONFIG}" ]; then
@@ -48,6 +51,9 @@ function build_uboot {
     export ARCH=arm64
 
     make "${MTK_DEFCONFIG}"
+    if [[ "${MODE}" == "release" ]]; then
+        scripts/kconfig/merge_config.sh .config "${BUILD}/config/defconfig_fragment/uboot-release.config"
+    fi
     make -j$(nproc)
 
     ./scripts/get_default_envs.sh > "${UBOOT_OUT_ENV}"
@@ -69,6 +75,7 @@ Options:
   --config   Mediatek board config file
   --build_ab (OPTIONAL) use ab defconfig
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 DELIM__
     exit 1
 }
@@ -76,9 +83,10 @@ DELIM__
 function main {
     local build_ab=false
     local clean=false
-    local config
+    local config=""
+    local mode=""
 
-    local OPTS=$(getopt -o '' -l build_ab,clean,config: -- "$@")
+    local OPTS=$(getopt -o '' -l build_ab,clean,config:,debug -- "$@")
     eval set -- "${OPTS}"
 
     while true; do
@@ -86,6 +94,7 @@ function main {
             --build_ab) build_ab=true; shift ;;
             --config) config=$(readlink -e "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
+            --debug) mode=debug; shift ;;
             --) shift; break ;;
             *) usage ;;
         esac
@@ -96,7 +105,7 @@ function main {
 
     # build uboot
     check_env
-    build_uboot "${config}" "${clean}" "${build_ab}"
+    build_uboot "${config}" "${clean}" "${build_ab}" "${mode}"
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then

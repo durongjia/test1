@@ -19,9 +19,18 @@ function build_bl2 {
     local ATF_PROJECT=$(config_value "$1" bl2.project)
     local MTK_CFLAGS=$(config_value "$1" bl2.cflags)
     local MTK_LIBDRAM_BOARD=$(config_value "$1" libdram.board)
-    local OUT_DIR=$(out_dir $1)
     local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}/src/${MTK_PLAT}/libdram.a"
     local clean="${2:-false}"
+    local MODE="${3:-release}"
+    local OUT_DIR=$(out_dir $1 $MODE)
+    local EXTRA_FLAGS=""
+
+
+    echo "--------------------> MODE: ${MODE} <--------------------"
+
+    if [[ "${MODE}" == "debug" ]]; then
+        EXTRA_FLAGS="${EXTRA_FLAGS} DEBUG=1"
+    fi
 
     ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
 
@@ -38,9 +47,9 @@ function build_bl2 {
     fi
 
     aarch64_env
-    make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" LIBDRAM="${LIBDRAM_A}" bl2
+    make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" LIBDRAM="${LIBDRAM_A}" ${EXTRA_FLAGS} bl2
 
-    pushd "build/${MTK_PLAT}/release"
+    pushd "build/${MTK_PLAT}/${MODE}"
     cp bl2.bin bl2.img.tmp
     truncate -s%4 bl2.img.tmp
 
@@ -48,7 +57,7 @@ function build_bl2 {
                      -d bl2.img.tmp bl2.img
 
     rm bl2.img.tmp
-    cp bl2.img "${OUT_DIR}/"
+    cp bl2.img "${OUT_DIR}/bl2-${MODE}.img"
     popd
 
     clear_vars

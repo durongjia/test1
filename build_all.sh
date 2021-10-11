@@ -13,9 +13,11 @@ source "${SRC}/utils.sh"
 
 function build_all {
     local MTK_PLAT=$(config_value "$1" plat)
-    local OUT_DIR=$(out_dir $1)
     local clean="${2:-false}"
+    local MODE="${3:-release}"
+    local OUT_DIR=$(out_dir $1 $MODE)
 
+    echo "--------------------> MODE: ${MODE} <--------------------"
 
     if [[ "${clean}" == true ]]; then
         [ -d "${OUT_DIR}" ] && rm -rf "${OUT_DIR}"
@@ -26,23 +28,24 @@ function build_all {
 
     # lk
     build_lk "$@"
-
     # uboot
-    build_uboot "$@"
-    build_uboot "$@" true
+    build_uboot "$1" "$2" false "$3"
+
+    # uboot build ab
+    build_uboot "$1" "$2" true "$3"
 
     # optee
     build_optee "$@"
 
     # fip
-    if [ -e "${OUT_DIR}/u-boot.bin" ]; then
-        build_fip "$1" "${OUT_DIR}/tee.bin" "${OUT_DIR}/u-boot.bin" \
-                  "fip_noab.bin" "${clean}"
+    if [ -e "${OUT_DIR}/u-boot-${MODE}.bin" ]; then
+        build_fip "$1" "${OUT_DIR}/tee-${MODE}.bin" "${OUT_DIR}/u-boot-${MODE}.bin" \
+                  "fip_${MODE}_noab.bin" "${clean}" "${MODE}"
     fi
 
-    if [ -e "${OUT_DIR}/u-boot-ab.bin" ]; then
-        build_fip "$1" "${OUT_DIR}/tee.bin" "${OUT_DIR}/u-boot-ab.bin" \
-                  "fip_ab.bin" "${clean}"
+    if [ -e "${OUT_DIR}/u-boot-${MODE}-ab.bin" ]; then
+        build_fip "$1" "${OUT_DIR}/tee-${MODE}.bin" "${OUT_DIR}/u-boot-${MODE}-ab.bin" \
+                  "fip_${MODE}_ab.bin" "${clean}" "${MODE}"
     fi
 }
 

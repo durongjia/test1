@@ -17,6 +17,7 @@ $ build_bl2.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 ```
 
 ## Build libdram
@@ -28,6 +29,7 @@ $ build_libdram.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 ```
 
 ## Build little kernel
@@ -39,6 +41,7 @@ $ build_lk.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 ```
 
 ## Build uboot
@@ -51,6 +54,7 @@ Options:
   --config   Mediatek board config file
   --build_ab (OPTIONAL) use ab defconfig
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 ```
 
 ## Build optee
@@ -62,6 +66,7 @@ $ build_optee.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 ```
 
 ## Build fip
@@ -76,6 +81,7 @@ Options:
   --bl33     Path to bl33 binary
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 ```
 
 ## Build ALL
@@ -87,6 +93,7 @@ $ build_all.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 ```
 
 ## Release Android

@@ -65,7 +65,9 @@ function config_value {
 
 function out_dir {
     local yaml_config=$(basename $1)
-    echo "${OUT}/${yaml_config%.yaml}"
+    local MODE="${2:-release}"
+
+    echo "${OUT}/${yaml_config%.yaml}/${MODE}"
 }
 
 function usage {
@@ -77,6 +79,7 @@ $ $(basename $0) --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
+  --debug    (OPTIONAL) build bootloader in debug mode
 DELIM__
     exit 1
 }
@@ -85,15 +88,17 @@ function main {
     local script=$(basename $0)
     local build="${script%.*}"
     local clean=false
-    local config
+    local config=""
+    local mode="release"
 
-    local OPTS=$(getopt -o '' -l clean,config: -- "$@")
+    local OPTS=$(getopt -o '' -l clean,config:,debug -- "$@")
     eval set -- "${OPTS}"
 
     while true; do
         case "$1" in
             --config) config=$(readlink -e "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
+            --debug) mode=debug; shift ;;
             --) shift; break ;;
             *) usage ;;
         esac
@@ -104,5 +109,5 @@ function main {
 
     # build
     check_env
-    $build "${config}" "${clean}"
+    $build "${config}" "${clean}" "${mode}"
 }
