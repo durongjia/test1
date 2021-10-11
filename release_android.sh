@@ -7,8 +7,7 @@ SRC=$(dirname $(readlink -e "$0"))
 source "${SRC}/build_all.sh"
 
 PROJECTS_AIOT=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
-               "libdram" "lk" "optee-os" "u-boot")
-PROJECTS_RICH_IOT=("build")
+               "libdram" "lk" "optee-os" "u-boot" "build")
 
 function check_local_changes {
     local STATUS
@@ -123,11 +122,10 @@ function main {
 
     # display commit message
     display_commit_msg_header
-    printf "soc: mt8167/mt8183: update binaries\n\n"
+    printf "soc: mt8167/mt8183/mt8365: update binaries\n\n"
     printf "This update contains following changes:\nXXXX\n\n"
 
     display_commit_msg "aiot" "${PROJECTS_AIOT[@]}"
-    display_commit_msg "rich-iot" "${PROJECTS_RICH_IOT[@]}"
 }
 
 main "$@"
