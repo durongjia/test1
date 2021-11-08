@@ -10,7 +10,7 @@ PROJECTS_AIOT=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
                "libdram" "lk" "optee-os" "u-boot" "build")
 
 function check_local_changes {
-    local STATUS
+    local PROJECTS=($@)
 
     for PROJECT in "${PROJECTS[@]}"; do
         pushd "${ROOT}/${PROJECT}"
@@ -158,7 +158,7 @@ function main {
     local OUT_DIR
     declare -A commits_msg
 
-    check_local_changes
+    check_local_changes "${PROJECTS_AIOT[@]}"
 
     pushd "${SRC}"
     for MODE in "${mode_list[@]}"; do
