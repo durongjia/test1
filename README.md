@@ -106,6 +106,9 @@ Options:
   --aosp     Android Root path
   --branch   Branch name
   --clean    (OPTIONAL) clean up AOSP projects
+
+The changes specified in the commit msg can be read from:
+${BUILD_PATH}/.android_commit_changes
 ```
 
 ## Release Android

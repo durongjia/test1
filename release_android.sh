@@ -60,8 +60,18 @@ function commit_msg_body {
     local HEAD
     local BRANCH
 
-    local BODY="This update contains following changes:\nXXXX\n\n"
+    local BODY="This update contains following changes:\n"
+    local COMMIT_CHANGES="${SRC}/.android_commit_changes"
+    if [ -f "${COMMIT_CHANGES}" ]; then
+        mapfile < "${COMMIT_CHANGES}" lines
+        for line in "${lines[@]}"; do
+            BODY+="${line}\n"
+        done
+    else
+        BODY+="XXXX\n"
+    fi
 
+    BODY+="\n"
     for PROJECT in "${PROJECTS[@]}"; do
         pushd "${ROOT}/${PROJECT}"
         BODY+="- Project: ${PROJECT}:\n"
@@ -126,6 +136,9 @@ $ $(basename $0) --aosp=/home/julien/Documents/mediatek/android
 Options:
   --aosp     Android Root path
   --commit   (OPTIONAL) commit binaries in AOSP
+
+The changes specified in the commit msg can be read from:
+${SRC}/.android_commit_changes
 DELIM__
     exit 1
 }
