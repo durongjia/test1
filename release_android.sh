@@ -47,6 +47,10 @@ function display_commit_msg_header {
     display_center_msg 86 "COMMIT MESSAGE IN:"
     printf "##\n##"
     display_center_msg 86 "${path}"
+    printf "##\n##"
+    printf "%0.s " {1..86}
+    printf "##\n##"
+    display_center_msg 86 "WARNING: u-boot-initial-env files have not been copied"
     printf "##\n"
     printf "%0.s#" {1..90}
     printf "\n\n"
@@ -119,8 +123,7 @@ function copy_binaries {
     local MTK_OUT="$1"
     local MTK_ANDROID_OUT="$2"
     local MODE=$4
-    local BINARIES=("bl2-${MODE}.img" "fip_${MODE}_ab.bin" "fip_${MODE}_noab.bin" "lk-${MODE}.bin"
-                    "u-boot-initial-${MODE}-env_ab" "u-boot-initial-${MODE}-env_noab")
+    local BINARIES=("bl2-${MODE}.img" "fip_${MODE}_ab.bin" "fip_${MODE}_noab.bin" "lk-${MODE}.bin")
 
     for BINARY in "${BINARIES[@]}"; do
         cp "${MTK_OUT}${BINARY}" "${MTK_ANDROID_OUT}"
