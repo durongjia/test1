@@ -96,6 +96,18 @@ Options:
   --debug    (OPTIONAL) build bootloader in debug mode
 ```
 
+## Setup Android
+``` {.sh}
+usage: setup_android.sh [options]
+
+$ setup_android.sh --aosp=/home/julien/Documents/mediatek/android --branch=jmasson/update-binaries
+
+Options:
+  --aosp     Android Root path
+  --branch   Branch name
+  --clean    (OPTIONAL) clean up AOSP projects
+```
+
 ## Release Android
 ``` {.sh}
 usage: release_android.sh [options]
