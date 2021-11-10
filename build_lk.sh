@@ -1,58 +1,59 @@
 #!/bin/bash
+
 set -e
 set -u
 set -o pipefail
 
-SRC=$(dirname $(readlink -e "$0"))
+SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
 source "${SRC}/build_libdram.sh"
 
 LK="${ROOT}/lk"
 
 function clean_lk {
-    local MTK_BOARD="$1"
-    if [ -d "build-${MTK_BOARD}" ]; then
-        rm -r "build-${MTK_BOARD}"
+    local mtk_board="$1"
+    if [ -d "build-${mtk_board}" ]; then
+        rm -r "build-${mtk_board}"
     fi
 }
 
 function build_lk {
-    local MTK_PLAT=$(config_value "$1" plat)
-    local MTK_BOARD=$(config_value "$1" lk.board)
-    local MTK_LIBDRAM_BOARD=$(config_value "$1" libdram.board)
-    local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}-lk/src/${MTK_PLAT}/libdram.a"
+    local mtk_plat=$(config_value "$1" plat)
+    local mtk_board=$(config_value "$1" lk.board)
+    local mtk_libdram_board=$(config_value "$1" libdram.board)
+    local libdram_a="${LIBDRAM}/build-${mtk_libdram_board}-lk/src/${mtk_plat}/libdram.a"
     local clean="${2:-false}"
-    local EXTRA_FLAGS=""
-    local MODE="${3:-release}"
-    local OUT_DIR=$(out_dir $1 $MODE)
+    local extra_flags=""
+    local mode="${3:-release}"
+    local out_dir=$(out_dir "$1" "${mode}")
 
-    echo "--------------------> MODE: ${MODE} <--------------------"
+    echo "--------------------> MODE: ${mode} <--------------------"
 
-    ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
+    ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
     if [[ "${clean}" == true ]]; then
         build_libdram "$1" true true
     else
         # check if libdram has been compiled
-        ! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false true
+        ! [ -a "${libdram_a}" ] && build_libdram "$1" false true
     fi
 
     pushd "${LK}"
     if [[ "${clean}" == true ]]; then
-        clean_lk "${MTK_BOARD}"
+        clean_lk "${mtk_board}"
     fi
 
-    if [[ "${MODE}" == "debug" ]]; then
-        EXTRA_FLAGS="${EXTRA_FLAGS} DEBUG=1"
+    if [[ "${mode}" == "debug" ]]; then
+        extra_flags="${extra_flags} DEBUG=1"
     else
-        EXTRA_FLAGS="${EXTRA_FLAGS} DEBUG=0"
+        extra_flags="${extra_flags} DEBUG=0"
     fi
 
     aarch64_env
-    make ARCH_arm64_TOOLCHAIN_PREFIX=aarch64-linux-gnu- CFLAGS="" ${EXTRA_FLAGS} \
+    make ARCH_arm64_TOOLCHAIN_PREFIX=aarch64-linux-gnu- CFLAGS="" "${extra_flags}" \
          GLOBAL_CFLAGS="-mstrict-align" SECURE_BOOT_ENABLE=no LIBGCC="" \
-         LIBDRAM="${LIBDRAM_A}" "${MTK_BOARD}"
-    cp "build-${MTK_BOARD}/lk.bin" "${OUT_DIR}/lk-${MODE}.bin"
+         LIBDRAM="${libdram_a}" "${mtk_board}"
+    cp "build-${mtk_board}/lk.bin" "${out_dir}/lk-${mode}.bin"
 
     clear_vars
     popd

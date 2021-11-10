@@ -1,55 +1,57 @@
 #!/bin/bash
+
 set -e
 set -u
 set -o pipefail
 
-SRC=$(dirname $(readlink -e "$0"))
+SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
 source "${SRC}/build_libdram.sh"
 
 function clean_bl2 {
-    local MTK_PLAT="$1"
-    if [ -d "build/${MTK_PLAT}" ]; then
-        rm -r "build/${MTK_PLAT}"
+    local mtk_plat="$1"
+    if [ -d "build/${mtk_plat}" ]; then
+        rm -r "build/${mtk_plat}"
     fi
 }
 
 function build_bl2 {
-    local MTK_PLAT=$(config_value "$1" plat)
-    local ATF_PROJECT=$(config_value "$1" bl2.project)
-    local MTK_CFLAGS=$(config_value "$1" bl2.cflags)
-    local MTK_LIBDRAM_BOARD=$(config_value "$1" libdram.board)
-    local LIBDRAM_A="${LIBDRAM}/build-${MTK_LIBDRAM_BOARD}/src/${MTK_PLAT}/libdram.a"
+    local mtk_plat=$(config_value "$1" plat)
+    local atf_project=$(config_value "$1" bl2.project)
+    local mtk_cflags=$(config_value "$1" bl2.cflags)
+    local mtk_libdram_board=$(config_value "$1" libdram.board)
+    local libdram_a="${LIBDRAM}/build-${mtk_libdram_board}/src/${mtk_plat}/libdram.a"
     local clean="${2:-false}"
-    local MODE="${3:-release}"
-    local OUT_DIR=$(out_dir $1 $MODE)
-    local EXTRA_FLAGS=""
+    local mode="${3:-release}"
+    local out_dir=$(out_dir "$1" "${mode}")
+    local extra_flags=""
 
+    echo "--------------------> MODE: ${mode} <--------------------"
 
-    echo "--------------------> MODE: ${MODE} <--------------------"
-
-    if [[ "${MODE}" == "debug" ]]; then
-        EXTRA_FLAGS="${EXTRA_FLAGS} DEBUG=1"
+    if [[ "${mode}" == "debug" ]]; then
+        extra_flags="${extra_flags} DEBUG=1"
+    else
+        extra_flags="${extra_flags} DEBUG=0"
     fi
 
-    ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
+    ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
     if [[ "${clean}" == true ]]; then
         build_libdram "$1" true false
     else
         # check if libdram has been compiled
-        ! [ -a "${LIBDRAM_A}" ] && build_libdram "$1" false false
+        ! [ -a "${libdram_a}" ] && build_libdram "$1" false false
     fi
 
-    pushd "${ROOT}/${ATF_PROJECT}"
+    pushd "${ROOT}/${atf_project}"
     if [[ "${clean}" == true ]]; then
-        clean_bl2 "${MTK_PLAT}"
+        clean_bl2 "${mtk_plat}"
     fi
 
     aarch64_env
-    make E=0 CFLAGS="${MTK_CFLAGS}" PLAT="${MTK_PLAT}" LIBDRAM="${LIBDRAM_A}" ${EXTRA_FLAGS} bl2
+    make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" LIBDRAM="${libdram_a}" "${extra_flags}" bl2
 
-    pushd "build/${MTK_PLAT}/${MODE}"
+    pushd "build/${mtk_plat}/${mode}"
     cp bl2.bin bl2.img.tmp
     truncate -s%4 bl2.img.tmp
 
@@ -57,7 +59,7 @@ function build_bl2 {
                      -d bl2.img.tmp bl2.img
 
     rm bl2.img.tmp
-    cp bl2.img "${OUT_DIR}/bl2-${MODE}.img"
+    cp bl2.img "${out_dir}/bl2-${mode}.img"
     popd
 
     clear_vars

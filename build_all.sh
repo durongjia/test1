@@ -1,9 +1,10 @@
 #!/bin/bash
+
 set -e
 set -u
 set -o pipefail
 
-SRC=$(dirname $(readlink -e "$0"))
+SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/build_bl2.sh"
 source "${SRC}/build_fip.sh"
 source "${SRC}/build_lk.sh"
@@ -12,15 +13,14 @@ source "${SRC}/build_uboot.sh"
 source "${SRC}/utils.sh"
 
 function build_all {
-    local MTK_PLAT=$(config_value "$1" plat)
     local clean="${2:-false}"
-    local MODE="${3:-release}"
-    local OUT_DIR=$(out_dir $1 $MODE)
+    local mode="${3:-release}"
+    local out_dir=$(out_dir "$1" "${mode}")
 
-    echo "--------------------> MODE: ${MODE} <--------------------"
+    echo "--------------------> MODE: ${mode} <--------------------"
 
     if [[ "${clean}" == true ]]; then
-        [ -d "${OUT_DIR}" ] && rm -rf "${OUT_DIR}"
+        [ -d "${out_dir}" ] && rm -rf "${out_dir}"
     fi
 
     # bl2
@@ -38,14 +38,14 @@ function build_all {
     build_optee "$@"
 
     # fip
-    if [ -e "${OUT_DIR}/u-boot-${MODE}.bin" ]; then
-        build_fip "$1" "${OUT_DIR}/tee-${MODE}.bin" "${OUT_DIR}/u-boot-${MODE}.bin" \
-                  "fip_${MODE}_noab.bin" "${clean}" "${MODE}"
+    if [ -e "${out_dir}/u-boot-${mode}.bin" ]; then
+        build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}.bin" \
+                  "fip_${mode}_noab.bin" "${clean}" "${mode}"
     fi
 
-    if [ -e "${OUT_DIR}/u-boot-${MODE}-ab.bin" ]; then
-        build_fip "$1" "${OUT_DIR}/tee-${MODE}.bin" "${OUT_DIR}/u-boot-${MODE}-ab.bin" \
-                  "fip_${MODE}_ab.bin" "${clean}" "${MODE}"
+    if [ -e "${out_dir}/u-boot-${mode}-ab.bin" ]; then
+        build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}-ab.bin" \
+                  "fip_${mode}_ab.bin" "${clean}" "${mode}"
     fi
 }
 

@@ -1,21 +1,22 @@
 #!/bin/bash
+
 set -e
 set -u
 set -o pipefail
 
-SRC=$(dirname $(readlink -e "$0"))
+SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/build_all.sh"
 
 PROJECTS_AIOT=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
                "libdram" "lk" "optee-os" "u-boot" "build")
 
 function check_local_changes {
-    local PROJECTS=($@)
+    local projects=("$@")
 
-    for PROJECT in "${PROJECTS[@]}"; do
-        pushd "${ROOT}/${PROJECT}"
-        if ! $(git diff-index --quiet HEAD); then
-            echo "Local changes detected in: ${PROJECT}"
+    for project in "${projects[@]}"; do
+        pushd "${ROOT}/${project}"
+        if ! git diff-index --quiet HEAD; then
+            echo "Local changes detected in: ${project}"
             exit 1
         fi
         popd
@@ -26,17 +27,17 @@ function display_center_msg {
     local line_length="$1"
     local msg="$2"
     local length=${#msg}
-    local pad=$(((line_length-length)/2))
+    local pad=$(((line_length - length) / 2))
 
-    printf "%0.s " $(seq 1 $pad)
+    printf "%0.s " $(seq 1 ${pad})
     printf "${msg}"
 
     # if line_length is an odd number, add 1 to pad
-    if [ $(((pad*2)+length)) != $line_length ]; then
-        pad=$((pad+1))
+    if [ $(((pad * 2) + length)) != "${line_length}" ]; then
+        pad=$((pad + 1))
     fi
 
-    printf "%0.s " $(seq 1 $pad)
+    printf "%0.s " $(seq 1 ${pad})
 }
 
 function display_commit_msg_header {
@@ -57,84 +58,84 @@ function display_commit_msg_header {
 }
 
 function commit_msg_body {
-    local REMOTE_NAME=$1 && shift
-    local PROJECTS=($@)
+    local remote_name=$1 && shift
+    local projects=("$@")
 
-    local REMOTE_URL
-    local HEAD
-    local BRANCH
+    local remote_url=""
+    local head=""
+    local branch=""
 
-    local BODY="This update contains following changes:\n"
-    local COMMIT_CHANGES="${SRC}/.android_commit_changes"
-    if [ -f "${COMMIT_CHANGES}" ]; then
-        mapfile < "${COMMIT_CHANGES}" lines
+    local body="This update contains following changes:\n"
+    local commit_changes="${SRC}/.android_commit_changes"
+    if [ -f "${commit_changes}" ]; then
+        mapfile < "${commit_changes}" lines
         for line in "${lines[@]}"; do
-            BODY+="${line}\n"
+            body+="${line}\n"
         done
     else
-        BODY+="XXXX\n"
+        body+="XXXX\n"
     fi
 
-    BODY+="\n"
-    for PROJECT in "${PROJECTS[@]}"; do
-        pushd "${ROOT}/${PROJECT}"
-        BODY+="- Project: ${PROJECT}:\n"
+    body+="\n"
+    for project in "${projects[@]}"; do
+        pushd "${ROOT}/${project}"
+        body+="- Project: ${project}:\n"
 
-        REMOTE_URL=$(git remote get-url ${REMOTE_NAME})
-        BODY+="URL: ${REMOTE_URL}\n"
+        remote_url=$(git remote get-url "${remote_name}")
+        body+="URL: ${remote_url}\n"
 
-        BRANCH=$(repo info . 2>&1 | perl -ne 'print "$1" if /^Manifest revision: (.*)/')
-        BODY+="Branch: ${BRANCH}\n"
+        branch=$(repo info . 2>&1 | perl -ne 'print "$1" if /^Manifest revision: (.*)/')
+        body+="Branch: ${branch}\n"
 
-        HEAD=$(git log --oneline --no-decorate -1)
-        BODY+="HEAD: ${HEAD}\n\n"
+        head=$(git log --oneline --no-decorate -1)
+        body+="HEAD: ${head}\n\n"
         popd
     done
 
-    echo $BODY
+    echo "${body}"
 }
 
 function add_commit_msg {
     local -n commits_msg_ref="$1"
-    local MTK_CONFIG="$2"
-    local MTK_ANDROID_OUT="$3"
-    local toplevel
-    local commits_msg_value
+    local mtk_config="$2"
+    local mtk_android_out="$3"
+    local toplevel=""
+    local commits_msg_value=""
 
-    # MTK_CONFIG: keep only basename without extension
-    MTK_CONFIG=$(basename "$2")
-    MTK_CONFIG="${MTK_CONFIG%.*}"
+    # mtk_config: keep only basename without extension
+    mtk_config=$(basename "$2")
+    mtk_config="${mtk_config%.*}"
 
-    pushd "${MTK_ANDROID_OUT}"
+    pushd "${mtk_android_out}"
     toplevel=$(git rev-parse --sq --show-toplevel)
-    if [[ -v "commits_msg_ref[${toplevel}]" ]] ; then
+    if [[ -v "commits_msg_ref[${toplevel}]" ]]; then
         commits_msg_value="${commits_msg_ref[${toplevel}]}"
-        if ! [[ "$commits_msg_value" =~ "${MTK_CONFIG}" ]]; then
-            unset commits_msg_ref[${toplevel}]
-            commits_msg_ref+=(["${toplevel}"]="${commits_msg_value}/${MTK_CONFIG}")
+        if ! [[ ${commits_msg_value} =~ ${mtk_config} ]]; then
+            unset commits_msg_ref["${toplevel}"]
+            commits_msg_ref+=(["${toplevel}"]="${commits_msg_value}/${mtk_config}")
         fi
     else
-        commits_msg_ref+=(["${toplevel}"]="${MTK_CONFIG}")
+        commits_msg_ref+=(["${toplevel}"]="${mtk_config}")
     fi
     popd
 }
 
 function copy_binaries {
-    local MTK_OUT="$1"
-    local MTK_ANDROID_OUT="$2"
-    local MODE=$4
-    local BINARIES=("bl2-${MODE}.img" "fip_${MODE}_ab.bin" "fip_${MODE}_noab.bin" "lk-${MODE}.bin")
+    local mtk_out="$1"
+    local mtk_android_out="$2"
+    local mode="$4"
+    local binaries=("bl2-${mode}.img" "fip_${mode}_ab.bin" "fip_${mode}_noab.bin" "lk-${mode}.bin")
 
-    for BINARY in "${BINARIES[@]}"; do
-        cp "${MTK_OUT}${BINARY}" "${MTK_ANDROID_OUT}"
+    for binary in "${binaries[@]}"; do
+        cp "${mtk_out}${binary}" "${mtk_android_out}"
     done
 }
 
 function usage {
     cat <<DELIM__
-usage: $(basename $0) [options]
+usage: $(basename "$0") [options]
 
-$ $(basename $0) --aosp=/home/julien/Documents/mediatek/android
+$ $(basename "$0") --aosp=/home/julien/Documents/mediatek/android
 
 Options:
   --aosp     Android Root path
@@ -147,14 +148,12 @@ DELIM__
 }
 
 function main {
-    local aosp
+    local aosp=""
     local commit=false
-    local mode_list=(
-        debug
-        release
-        )
-    local OPTS=$(getopt -o '' -l aosp:,commit -- "$@")
-    eval set -- "${OPTS}"
+    local mode_list=(debug release)
+
+    local opts=$(getopt -o '' -l aosp:,commit -- "$@")
+    eval set -- "${opts}"
 
     while true; do
         case "$1" in
@@ -169,28 +168,26 @@ function main {
     [ -z "${aosp}" ] && echo "Cannot find Android Root Path" && usage
 
     # build all configs
-    local MTK_PLAT
-    local MTK_BINARIES_PATH
-    local OUT_DIR
+    local mtk_binaries_path=""
+    local out_dir=""
     declare -A commits_msg
 
     check_local_changes "${PROJECTS_AIOT[@]}"
 
     pushd "${SRC}"
-    for MODE in "${mode_list[@]}"; do
-        echo "----------------> Build: ${MODE} <----------------"
-        for MTK_CONFIG in $(ls config/boards/*.yaml); do
-            MTK_PLAT=$(config_value "${MTK_CONFIG}" plat)
-            MTK_BINARIES_PATH=$(config_value "${MTK_CONFIG}" android.binaries_path)
-            OUT_DIR=$(out_dir "${MTK_CONFIG}" "${MODE}")
+    for mode in "${mode_list[@]}"; do
+        echo "----------------> Build: ${mode} <----------------"
+        for mtk_config in config/boards/*.yaml; do
+            mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
+            out_dir=$(out_dir "${mtk_config}" "${mode}")
 
-            echo "-> Build: ${MTK_CONFIG}"
-            build_all "${MTK_CONFIG}" "true" "${MODE}"
-            if [ -d "${aosp}/${MTK_BINARIES_PATH}" ]; then
-                copy_binaries "${OUT_DIR}/" "${aosp}/${MTK_BINARIES_PATH}" "${MTK_CONFIG}" "${MODE}"
-                add_commit_msg commits_msg "${MTK_CONFIG}" "${aosp}/${MTK_BINARIES_PATH}"
+            echo "-> Build: ${mtk_config}"
+            build_all "${mtk_config}" "true" "${mode}"
+            if [ -d "${aosp}/${mtk_binaries_path}" ]; then
+                copy_binaries "${out_dir}/" "${aosp}/${mtk_binaries_path}" "${mtk_config}" "${mode}"
+                add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
             else
-                echo "ERROR: cannot copy binaries, ${aosp}/${MTK_BINARIES_PATH} not found"
+                echo "ERROR: cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
                 exit 1
             fi
         done
@@ -199,14 +196,14 @@ function main {
 
     # commits message
     local commit_body=$(commit_msg_body "aiot" "${PROJECTS_AIOT[@]}")
-    local commit_title
-    local commit_msg
+    local commit_title=""
+    local commit_msg=""
     for path in "${!commits_msg[@]}"; do
         pushd "${path}"
 
         # display commit
         display_commit_msg_header "${path}"
-        commit_title="${commits_msg[$path]}: update binaries\n\n"
+        commit_title="${commits_msg[${path}]}: update binaries\n\n"
         commit_msg=$(echo -e "${commit_title}${commit_body}")
         echo "${commit_msg}"
 

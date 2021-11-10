@@ -1,52 +1,53 @@
 #!/bin/bash
+
 set -e
 set -u
 set -o pipefail
 
-SRC=$(dirname $(readlink -e "$0"))
+SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
 
 LIBDRAM="${ROOT}/libdram"
 
 function clean_libdram {
-    local MTK_BUILD="$1"
-    local MTK_BOARD="$2"
-    local LIBDRAM_CONFIG="$3"
+    local mtk_build="$1"
+    local mtk_board="$2"
+    local libdram_config="$3"
 
-    [ -d "${MTK_BUILD}" ] && rm -r "${MTK_BUILD}"
-    if [ -e "${LIBDRAM_CONFIG}" ] && [ -d "boards/${MTK_BOARD}/" ]; then
-        rm -r "boards/${MTK_BOARD}/"
+    [ -d "${mtk_build}" ] && rm -r "${mtk_build}"
+    if [ -e "${libdram_config}" ] && [ -d "boards/${mtk_board}/" ]; then
+        rm -r "boards/${mtk_board}/"
     fi
 }
 
 function build_libdram {
-    local MTK_BOARD=$(config_value "$1" libdram.board)
-    local MTK_BUILD=""
+    local mtk_board=$(config_value "$1" libdram.board)
+    local mtk_build=""
     local clean="${2:-false}"
     local build_for_lk="$3"
-    local LIBDRAM_CONFIG="${SRC}/config/libdram/${MTK_BOARD}"
+    local libdram_config="${SRC}/config/libdram/${mtk_board}"
 
     if [[ "${build_for_lk}" == true ]]; then
-        MTK_BUILD="build-${MTK_BOARD}-lk"
+        mtk_build="build-${mtk_board}-lk"
     else
-        MTK_BUILD="build-${MTK_BOARD}"
+        mtk_build="build-${mtk_board}"
     fi
 
     pushd "${LIBDRAM}"
-    [[ "${clean}" == true ]] && clean_libdram "${MTK_BUILD}" "${MTK_BOARD}" "${LIBDRAM_CONFIG}"
+    [[ "${clean}" == true ]] && clean_libdram "${mtk_build}" "${mtk_board}" "${libdram_config}"
 
-    if [ -e "${LIBDRAM_CONFIG}" ]; then
-        mkdir -p "boards/${MTK_BOARD}"
-        cp "${LIBDRAM_CONFIG}" "boards/${MTK_BOARD}/meson.build"
+    if [ -e "${libdram_config}" ]; then
+        mkdir -p "boards/${mtk_board}"
+        cp "${libdram_config}" "boards/${mtk_board}/meson.build"
     fi
 
     aarch64_env
     if [[ "${build_for_lk}" == true ]]; then
-        meson "${MTK_BUILD}" -Dboard="${MTK_BOARD}" -Dlk=true --cross-file meson.cross
+        meson "${mtk_build}" -Dboard="${mtk_board}" -Dlk=true --cross-file meson.cross
     else
-        meson "${MTK_BUILD}" -Dboard="${MTK_BOARD}" --cross-file meson.cross
+        meson "${mtk_build}" -Dboard="${mtk_board}" --cross-file meson.cross
     fi
-    ninja -C "${MTK_BUILD}"
+    ninja -C "${mtk_build}"
 
     clear_vars
     popd

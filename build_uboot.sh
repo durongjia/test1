@@ -1,9 +1,10 @@
 #!/bin/bash
+
 set -e
 set -u
 set -o pipefail
 
-SRC=$(dirname $(readlink -e "$0"))
+SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
 
 UBOOT="${ROOT}/u-boot"
@@ -13,27 +14,27 @@ function clean_uboot {
 }
 
 function build_uboot {
-    local MTK_PLAT=$(config_value "$1" plat)
     local clean="${2:-false}"
     local build_ab="${3:-false}"
-    local MODE="${4:-release}"
-    local OUT_DIR=$(out_dir $1 $MODE)
+    local mode="${4:-release}"
+    local out_dir=$(out_dir "$1" "${mode}")
 
-    echo "--------------------> FORCE MODE: ${MODE} <--------------------"
+    echo "--------------------> FORCE MODE: ${mode} <--------------------"
 
-    local MTK_DEFCONFIG
-    local UBOOT_OUT_BIN
+    local mtk_defconfig=""
+    local uboot_out_bin=""
+    local uboot_out_env=""
     if [[ "${build_ab}" == true ]]; then
-        MTK_DEFCONFIG=$(config_value "$1" uboot.ab_defconfig)
-        UBOOT_OUT_BIN="${OUT_DIR}/u-boot-${MODE}-ab.bin"
-        UBOOT_OUT_ENV="${OUT_DIR}/u-boot-initial-${MODE}-env_ab"
+        mtk_defconfig=$(config_value "$1" uboot.ab_defconfig)
+        uboot_out_bin="${out_dir}/u-boot-${mode}-ab.bin"
+        uboot_out_env="${out_dir}/u-boot-initial-${mode}-env_ab"
     else
-        MTK_DEFCONFIG=$(config_value "$1" uboot.defconfig)
-        UBOOT_OUT_BIN="${OUT_DIR}/u-boot-${MODE}.bin"
-        UBOOT_OUT_ENV="${OUT_DIR}/u-boot-initial-${MODE}-env_noab"
+        mtk_defconfig=$(config_value "$1" uboot.defconfig)
+        uboot_out_bin="${out_dir}/u-boot-${mode}.bin"
+        uboot_out_env="${out_dir}/u-boot-initial-${mode}-env_noab"
     fi
 
-    if [ -z "${MTK_DEFCONFIG}" ]; then
+    if [ -z "${mtk_defconfig}" ]; then
         if [[ "${build_ab}" == true ]]; then
             echo "uboot: skip build, ab_defconfig not provided"
         else
@@ -42,22 +43,22 @@ function build_uboot {
         return
     fi
 
-    ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
+    ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
     pushd "${UBOOT}"
-    [[ "${clean}" == true ]] && clean_uboot "${MTK_PLAT}"
+    [[ "${clean}" == true ]] && clean_uboot
 
     aarch64_env
     export ARCH=arm64
 
-    make "${MTK_DEFCONFIG}"
-    if [[ "${MODE}" == "release" ]]; then
+    make "${mtk_defconfig}"
+    if [[ "${mode}" == "release" ]]; then
         scripts/kconfig/merge_config.sh .config "${BUILD}/config/defconfig_fragment/uboot-release.config"
     fi
-    make -j$(nproc)
+    make -j"$(nproc)"
 
-    ./scripts/get_default_envs.sh > "${UBOOT_OUT_ENV}"
-    cp u-boot.bin "${UBOOT_OUT_BIN}"
+    ./scripts/get_default_envs.sh > "${uboot_out_env}"
+    cp u-boot.bin "${uboot_out_bin}"
 
     unset ARCH
     clear_vars
@@ -67,9 +68,9 @@ function build_uboot {
 # main
 function usage {
     cat <<DELIM__
-usage: $(basename $0) [options]
+usage: $(basename "$0") [options]
 
-$ $(basename $0) --config=i500-pumpkin.yaml --build_ab
+$ $(basename "$0") --config=i500-pumpkin.yaml --build_ab
 
 Options:
   --config   Mediatek board config file
@@ -86,8 +87,8 @@ function main {
     local config=""
     local mode=""
 
-    local OPTS=$(getopt -o '' -l build_ab,clean,config:,debug -- "$@")
-    eval set -- "${OPTS}"
+    local opts=$(getopt -o '' -l build_ab,clean,config:,debug -- "$@")
+    eval set -- "${opts}"
 
     while true; do
         case "$1" in

@@ -4,14 +4,14 @@ set -e
 set -u
 set -o pipefail
 
-SRC=$(dirname $(readlink -e "$0"))
+SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
 
 function usage {
     cat <<DELIM__
-usage: $(basename $0) [options]
+usage: $(basename "$0") [options]
 
-$ $(basename $0) --aosp=/home/julien/Documents/mediatek/android --branch=jmasson/update-binaries
+$ $(basename "$0") --aosp=/home/julien/Documents/mediatek/android --branch=jmasson/update-binaries
 
 Options:
   --aosp     Android Root path
@@ -24,15 +24,15 @@ DELIM__
 function projects_path {
     local -n projects_ref="$1"
     local aosp="$2"
-    local MTK_BINARIES_PATH
-    local toplevel
+    local mtk_binaries_path=""
+    local toplevel=""
 
     pushd "${SRC}"
-    for MTK_CONFIG in $(ls config/boards/*.yaml); do
-        MTK_BINARIES_PATH=$(config_value "${MTK_CONFIG}" android.binaries_path)
-        pushd "${aosp}/${MTK_BINARIES_PATH}"
+    for mtk_config in config/boards/*.yaml; do
+        mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
+        pushd "${aosp}/${mtk_binaries_path}"
         toplevel=$(git rev-parse --sq --show-toplevel)
-        if [[ ! " ${projects_ref[*]} " =~ " ${toplevel} " ]]; then
+        if [[ ! ${projects_ref[*]} =~ ${toplevel} ]]; then
             projects_ref+=("${toplevel}")
         fi
         popd
@@ -43,8 +43,9 @@ function main {
     local aosp=""
     local branch=""
     local clean=false
-    local OPTS=$(getopt -o '' -l aosp:,branch:,clean -- "$@")
-    eval set -- "${OPTS}"
+
+    local opts=$(getopt -o '' -l aosp:,branch:,clean -- "$@")
+    eval set -- "${opts}"
 
     while true; do
         case "$1" in
@@ -73,13 +74,13 @@ function main {
         fi
 
         # check local changes
-        if ! $(git diff-index --quiet HEAD); then
+        if ! git diff-index --quiet HEAD; then
             echo "error: Local changes detected"
             exit 1
         fi
 
         # check if branch exist
-        if $(git show-ref --quiet "${branch}"); then
+        if git show-ref --quiet "${branch}"; then
             git checkout --quiet --detach
             git branch --quiet -D "${branch}"
         fi

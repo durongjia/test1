@@ -1,9 +1,10 @@
-#!/bin/bash 
+#!/bin/bash
+
 set -e
 set -u
 set -o pipefail
 
-SRC=$(dirname $(readlink -e "$0"))
+SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
 
 OPTEE="${ROOT}/optee-os"
@@ -15,33 +16,33 @@ function clean_optee {
 }
 
 function build_optee {
-    local MTK_PLAT=$(config_value "$1" plat)
-    local OPTEE_FLAGS=$(config_value "$1" optee.flags)
-    local OPTEE_BOARD=$(config_value "$1" optee.board)
+    local mtk_plat=$(config_value "$1" plat)
+    local optee_flags=$(config_value "$1" optee.flags)
+    local optee_board=$(config_value "$1" optee.board)
     local clean="${2:-false}"
-    local MODE="${3:-release}"
-    local OUT_DIR=$(out_dir $1 $MODE)
+    local mode="${3:-release}"
+    local out_dir=$(out_dir "$1" "${mode}")
 
-    echo "--------------------> MODE: ${MODE} <--------------------"
+    echo "--------------------> MODE: ${mode} <--------------------"
 
-    ! [ -d "${OUT_DIR}" ] && mkdir -p "${OUT_DIR}"
+    ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
     pushd "${OPTEE}"
-    [[ "${clean}" == true ]] && clean_optee "${MTK_PLAT}"
+    [[ "${clean}" == true ]] && clean_optee "${mtk_plat}"
 
-    if [[ "${MODE}" == "debug" ]]; then
-       OPTEE_FLAGS="${OPTEE_FLAGS} DEBUG=1"
+    if [[ "${mode}" == "debug" ]]; then
+        optee_flags="${optee_flags} DEBUG=1"
     else
-       OPTEE_FLAGS="${OPTEE_FLAGS} DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
+        optee_flags="${optee_flags} DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
     fi
 
     aarch64_env
-    if [ -n "${OPTEE_BOARD}" ]; then
-        make -j$(nproc) PLATFORM="mediatek-${OPTEE_BOARD}" $OPTEE_FLAGS all
+    if [ -n "${optee_board}" ]; then
+        make -j"$(nproc)" PLATFORM="mediatek-${optee_board}" ${optee_flags} all
     else
-        make -j$(nproc) PLATFORM="mediatek-${MTK_PLAT}" $OPTEE_FLAGS all
+        make -j"$(nproc)" PLATFORM="mediatek-${mtk_plat}" ${optee_flags} all
     fi
-    cp out/arm-plat-mediatek/core/tee.bin "${OUT_DIR}/tee-${MODE}.bin"
+    cp out/arm-plat-mediatek/core/tee.bin "${out_dir}/tee-${mode}.bin"
 
     clear_vars
     popd
