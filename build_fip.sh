@@ -28,7 +28,7 @@ function build_fip {
     local mode="${6:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
 
-    echo "--------------------> MODE: ${mode} <--------------------"
+    display_current_build "$1" "fip" "${mode}"
 
     if [[ "${mode}" == "debug" ]]; then
         extra_flags="${extra_flags} DEBUG=1 log_level=${log_level} ENABLE_LTO=1"

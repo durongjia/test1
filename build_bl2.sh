@@ -26,7 +26,7 @@ function build_bl2 {
     local out_dir=$(out_dir "$1" "${mode}")
     local extra_flags=""
 
-    echo "--------------------> MODE: ${mode} <--------------------"
+    display_current_build "$1" "bl2" "${mode}"
 
     if [[ "${mode}" == "debug" ]]; then
         extra_flags="${extra_flags} DEBUG=1"
@@ -37,10 +37,10 @@ function build_bl2 {
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
     if [[ "${clean}" == true ]]; then
-        build_libdram "$1" true false
+        build_libdram "$1" true false "${mode}"
     else
         # check if libdram has been compiled
-        ! [ -a "${libdram_a}" ] && build_libdram "$1" false false
+        ! [ -a "${libdram_a}" ] && build_libdram "$1" false false "${mode}"
     fi
 
     pushd "${ROOT}/${atf_project}"

@@ -17,8 +17,6 @@ function build_all {
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
 
-    echo "--------------------> MODE: ${mode} <--------------------"
-
     if [[ "${clean}" == true ]]; then
         [ -d "${out_dir}" ] && rm -rf "${out_dir}"
     fi

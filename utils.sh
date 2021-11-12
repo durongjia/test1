@@ -70,6 +70,18 @@ function out_dir {
     echo "${OUT}/${yaml_config%.yaml}/${mode}"
 }
 
+function display_current_build {
+    local yaml_config=$(basename "$1")
+    local build="$2"
+    local mode="$3"
+
+    printf "\n"
+    printf "%0.s-" {1..20}
+    printf "> Build %s: %s - %s <" "${build}" "${yaml_config%.yaml}" "${mode}"
+    printf "%0.s-" {1..20}
+    printf "\n"
+}
+
 function usage {
     cat <<DELIM__
 usage: $(basename "$0") [options]

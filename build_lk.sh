@@ -27,15 +27,15 @@ function build_lk {
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
 
-    echo "--------------------> MODE: ${mode} <--------------------"
+    display_current_build "$1" "lk" "${mode}"
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
     if [[ "${clean}" == true ]]; then
-        build_libdram "$1" true true
+        build_libdram "$1" true true "${mode}"
     else
         # check if libdram has been compiled
-        ! [ -a "${libdram_a}" ] && build_libdram "$1" false true
+        ! [ -a "${libdram_a}" ] && build_libdram "$1" false true "${mode}"
     fi
 
     pushd "${LK}"

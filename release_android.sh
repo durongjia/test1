@@ -176,12 +176,10 @@ function main {
 
     pushd "${SRC}"
     for mode in "${mode_list[@]}"; do
-        echo "----------------> Build: ${mode} <----------------"
         for mtk_config in config/boards/*.yaml; do
             mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
             out_dir=$(out_dir "${mtk_config}" "${mode}")
 
-            echo "-> Build: ${mtk_config}"
             build_all "${mtk_config}" "true" "${mode}"
             if [ -d "${aosp}/${mtk_binaries_path}" ]; then
                 copy_binaries "${out_dir}/" "${aosp}/${mtk_binaries_path}" "${mtk_config}" "${mode}"

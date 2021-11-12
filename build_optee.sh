@@ -23,7 +23,7 @@ function build_optee {
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
 
-    echo "--------------------> MODE: ${mode} <--------------------"
+    display_current_build "$1" "optee" "${mode}"
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 

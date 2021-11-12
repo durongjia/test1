@@ -18,8 +18,7 @@ function build_uboot {
     local build_ab="${3:-false}"
     local mode="${4:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
-
-    echo "--------------------> FORCE MODE: ${mode} <--------------------"
+    local build="uboot"
 
     local mtk_defconfig=""
     local uboot_out_bin=""
@@ -28,11 +27,14 @@ function build_uboot {
         mtk_defconfig=$(config_value "$1" uboot.ab_defconfig)
         uboot_out_bin="${out_dir}/u-boot-${mode}-ab.bin"
         uboot_out_env="${out_dir}/u-boot-initial-${mode}-env_ab"
+        build="uboot ab"
     else
         mtk_defconfig=$(config_value "$1" uboot.defconfig)
         uboot_out_bin="${out_dir}/u-boot-${mode}.bin"
         uboot_out_env="${out_dir}/u-boot-initial-${mode}-env_noab"
     fi
+
+    display_current_build "$1" "${build}" "${mode}"
 
     if [ -z "${mtk_defconfig}" ]; then
         if [[ "${build_ab}" == true ]]; then

@@ -25,13 +25,18 @@ function build_libdram {
     local mtk_build=""
     local clean="${2:-false}"
     local build_for_lk="$3"
+    local mode="${4:-release}"
     local libdram_config="${SRC}/config/libdram/${mtk_board}"
+    local build="libdram"
 
     if [[ "${build_for_lk}" == true ]]; then
         mtk_build="build-${mtk_board}-lk"
+        build="libdram lk"
     else
         mtk_build="build-${mtk_board}"
     fi
+
+    display_current_build "$1" "${build}" "${mode}"
 
     pushd "${LIBDRAM}"
     [[ "${clean}" == true ]] && clean_libdram "${mtk_build}" "${mtk_board}" "${libdram_config}"
