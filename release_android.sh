@@ -140,6 +140,7 @@ $ $(basename "$0") --aosp=/home/julien/Documents/mediatek/android
 Options:
   --aosp     Android Root path
   --commit   (OPTIONAL) commit binaries in AOSP
+  --silent   (OPTIONAL) silent build commands
 
 The changes specified in the commit msg can be read from:
 ${SRC}/.android_commit_changes
@@ -150,15 +151,17 @@ DELIM__
 function main {
     local aosp=""
     local commit=false
+    local silent=false
     local mode_list=(debug release)
 
-    local opts=$(getopt -o '' -l aosp:,commit -- "$@")
+    local opts=$(getopt -o '' -l aosp:,commit,silent -- "$@")
     eval set -- "${opts}"
 
     while true; do
         case "$1" in
             --aosp) aosp=$(readlink -e "$2"); shift 2 ;;
             --commit) commit=true; shift ;;
+            --silent) silent=true; shift ;;
             --) shift; break ;;
             *) usage ;;
         esac
@@ -180,7 +183,13 @@ function main {
             mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
             out_dir=$(out_dir "${mtk_config}" "${mode}")
 
-            build_all "${mtk_config}" "true" "${mode}"
+            if [[ "${silent}" == true ]]; then
+                display_current_build "${mtk_config}" "all" "${mode}"
+                build_all "${mtk_config}" "true" "${mode}" &> /dev/null
+            else
+                build_all "${mtk_config}" "true" "${mode}"
+            fi
+
             if [ -d "${aosp}/${mtk_binaries_path}" ]; then
                 copy_binaries "${out_dir}/" "${aosp}/${mtk_binaries_path}" "${mtk_config}" "${mode}"
                 add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
