@@ -23,11 +23,17 @@ function build_lk {
     local mtk_libdram_board=$(config_value "$1" libdram.board)
     local libdram_a="${LIBDRAM}/build-${mtk_libdram_board}-lk/src/${mtk_plat}/libdram.a"
     local clean="${2:-false}"
-    local extra_flags=""
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
+    local extra_flags=""
 
     display_current_build "$1" "lk" "${mode}"
+
+    if [[ "${mode}" == "debug" ]]; then
+        extra_flags="DEBUG=1"
+    else
+        extra_flags="DEBUG=0"
+    fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
@@ -39,18 +45,11 @@ function build_lk {
     fi
 
     pushd "${LK}"
-    if [[ "${clean}" == true ]]; then
-        clean_lk "${mtk_board}"
-    fi
-
-    if [[ "${mode}" == "debug" ]]; then
-        extra_flags="${extra_flags} DEBUG=1"
-    else
-        extra_flags="${extra_flags} DEBUG=0"
-    fi
+    [[ "${clean}" == true ]] && clean_lk "${mtk_board}"
 
     aarch64_env
-    make ARCH_arm64_TOOLCHAIN_PREFIX=aarch64-linux-gnu- CFLAGS="" "${extra_flags}" \
+
+    make ARCH_arm64_TOOLCHAIN_PREFIX=aarch64-linux-gnu- CFLAGS="" ${extra_flags} \
          GLOBAL_CFLAGS="-mstrict-align" SECURE_BOOT_ENABLE=no LIBGCC="" \
          LIBDRAM="${libdram_a}" "${mtk_board}"
     cp "build-${mtk_board}/lk.bin" "${out_dir}/lk-${mode}.bin"

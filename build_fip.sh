@@ -33,9 +33,9 @@ function build_fip {
     display_current_build "$1" "fip" "${mode}"
 
     if [[ "${mode}" == "debug" ]]; then
-        extra_flags="${extra_flags} DEBUG=1 log_level=${log_level} ENABLE_LTO=1"
+        extra_flags="DEBUG=1 log_level=${log_level} ENABLE_LTO=1"
     else
-        extra_flags="${extra_flags} DEBUG=0 log_level=0"
+        extra_flags="DEBUG=0 log_level=0"
     fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
@@ -51,6 +51,7 @@ function build_fip {
     [[ "${clean}" == true ]] && clean_fip "${mtk_plat}"
 
     arm-none_env
+
     make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" BL32="${bl32_bin}" BL33="${bl33_bin}" \
          LIBDRAM="${libdram_a}" ${extra_flags} SPD=opteed NEED_BL32=yes NEED_BL33=yes bl31 fip
 
@@ -86,7 +87,8 @@ function main {
     local output=""
     local mode=""
 
-    local opts=$(getopt -o '' -l bl32:,bl33:,clean,config:,output:,debug -- "$@")
+    local opts_args="bl32:,bl33:,clean,config:,output:,debug"
+    local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
     while true; do

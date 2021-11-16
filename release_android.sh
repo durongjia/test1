@@ -154,7 +154,8 @@ function main {
     local silent=false
     local mode_list=(debug release)
 
-    local opts=$(getopt -o '' -l aosp:,commit,silent -- "$@")
+    local opts_args="aosp:,commit,silent"
+    local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
     while true; do

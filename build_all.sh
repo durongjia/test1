@@ -17,8 +17,8 @@ function build_all {
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
 
-    if [[ "${clean}" == true ]]; then
-        [ -d "${out_dir}" ] && rm -rf "${out_dir}"
+    if [[ "${clean}" == true ]] && [ -d "${out_dir}" ]; then
+        rm -rf "${out_dir}"
     fi
 
     # bl2
@@ -26,6 +26,7 @@ function build_all {
 
     # lk
     build_lk "$@"
+
     # uboot
     build_uboot "$1" "$2" false "$3"
 
@@ -36,15 +37,12 @@ function build_all {
     build_optee "$@"
 
     # fip
-    if [ -e "${out_dir}/u-boot-${mode}.bin" ]; then
-        build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}.bin" \
-                  "fip_${mode}_noab.bin" "${clean}" "${mode}"
-    fi
+    build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}.bin" \
+              "fip_${mode}_noab.bin" "${clean}" "${mode}"
 
-    if [ -e "${out_dir}/u-boot-${mode}-ab.bin" ]; then
-        build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}-ab.bin" \
-                  "fip_${mode}_ab.bin" "${clean}" "${mode}"
-    fi
+    # fip ab
+    build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}-ab.bin" \
+              "fip_${mode}_ab.bin" "${clean}" "${mode}"
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then

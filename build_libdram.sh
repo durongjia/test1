@@ -22,18 +22,17 @@ function clean_libdram {
 
 function build_libdram {
     local mtk_board=$(config_value "$1" libdram.board)
-    local mtk_build=""
+    local mtk_build="build-${mtk_board}"
     local clean="${2:-false}"
     local build_for_lk="$3"
     local mode="${4:-release}"
     local libdram_config="${SRC}/config/libdram/${mtk_board}"
     local build="libdram"
+    local extra_flags=""
 
     if [[ "${build_for_lk}" == true ]]; then
         mtk_build="build-${mtk_board}-lk"
         build="libdram lk"
-    else
-        mtk_build="build-${mtk_board}"
     fi
 
     display_current_build "$1" "${build}" "${mode}"
@@ -47,11 +46,11 @@ function build_libdram {
     fi
 
     aarch64_env
+
     if [[ "${build_for_lk}" == true ]]; then
-        meson "${mtk_build}" -Dboard="${mtk_board}" -Dlk=true --cross-file meson.cross
-    else
-        meson "${mtk_build}" -Dboard="${mtk_board}" --cross-file meson.cross
+        extra_flags="-Dlk=true"
     fi
+    meson "${mtk_build}" -Dboard="${mtk_board}" ${extra_flags} --cross-file meson.cross
     ninja -C "${mtk_build}"
 
     clear_vars

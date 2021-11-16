@@ -22,26 +22,30 @@ function build_optee {
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
+    local platform=""
 
     display_current_build "$1" "optee" "${mode}"
+
+    if [[ "${mode}" == "debug" ]]; then
+        optee_flags+=" DEBUG=1"
+    else
+        optee_flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
+    fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
     pushd "${OPTEE}"
     [[ "${clean}" == true ]] && clean_optee "${mtk_plat}"
 
-    if [[ "${mode}" == "debug" ]]; then
-        optee_flags="${optee_flags} DEBUG=1"
-    else
-        optee_flags="${optee_flags} DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
-    fi
-
     aarch64_env
+
     if [ -n "${optee_board}" ]; then
-        make -j"$(nproc)" PLATFORM="mediatek-${optee_board}" ${optee_flags} all
+        platform="mediatek-${optee_board}"
     else
-        make -j"$(nproc)" PLATFORM="mediatek-${mtk_plat}" ${optee_flags} all
+        platform="mediatek-${mtk_plat}"
     fi
+    make -j"$(nproc)" PLATFORM="${platform}" ${optee_flags} all
+
     cp out/arm-plat-mediatek/core/tee.bin "${out_dir}/tee-${mode}.bin"
 
     clear_vars

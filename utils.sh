@@ -103,7 +103,8 @@ function main {
     local config=""
     local mode="release"
 
-    local opts=$(getopt -o '' -l clean,config:,debug -- "$@")
+    local opts_args="clean,config:,debug"
+    local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
     while true; do

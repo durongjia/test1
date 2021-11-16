@@ -29,9 +29,9 @@ function build_bl2 {
     display_current_build "$1" "bl2" "${mode}"
 
     if [[ "${mode}" == "debug" ]]; then
-        extra_flags="${extra_flags} DEBUG=1"
+        extra_flags="DEBUG=1"
     else
-        extra_flags="${extra_flags} DEBUG=0"
+        extra_flags="DEBUG=0"
     fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
@@ -44,12 +44,11 @@ function build_bl2 {
     fi
 
     pushd "${ROOT}/${atf_project}"
-    if [[ "${clean}" == true ]]; then
-        clean_bl2 "${mtk_plat}"
-    fi
+    [[ "${clean}" == true ]] && clean_bl2 "${mtk_plat}"
 
     aarch64_env
-    make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" LIBDRAM="${libdram_a}" "${extra_flags}" bl2
+
+    make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" LIBDRAM="${libdram_a}" ${extra_flags} bl2
 
     pushd "build/${mtk_plat}/${mode}"
     cp bl2.bin bl2.img.tmp

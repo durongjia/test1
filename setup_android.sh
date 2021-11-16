@@ -44,7 +44,8 @@ function main {
     local branch=""
     local clean=false
 
-    local opts=$(getopt -o '' -l aosp:,branch:,clean -- "$@")
+    local opts_args="aosp:,branch:,clean"
+    local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
     while true; do

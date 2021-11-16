@@ -89,7 +89,8 @@ function main {
     local config=""
     local mode=""
 
-    local opts=$(getopt -o '' -l build_ab,clean,config:,debug -- "$@")
+    local opts_args="build_ab,clean,config:,debug"
+    local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
     while true; do
