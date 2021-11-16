@@ -15,6 +15,15 @@ function popd {
     command popd > /dev/null
 }
 
+function find_path {
+    local path="$1"
+    local real_path=""
+    if [ -e "${path}" ]; then
+        real_path=$(readlink -e "${path}")
+    fi
+    echo "${real_path}"
+}
+
 function aarch64_env {
     export PATH="${TOOLCHAINS}/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH"
     export CROSS_COMPILE=aarch64-linux-gnu-
@@ -109,7 +118,7 @@ function main {
 
     while true; do
         case "$1" in
-            --config) config=$(readlink -e "$2"); shift 2 ;;
+            --config) config=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
             --debug) mode=debug; shift ;;
             --) shift; break ;;

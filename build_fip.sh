@@ -93,10 +93,10 @@ function main {
 
     while true; do
         case "$1" in
-            --bl32) bl32=$(readlink -e "$2"); shift 2 ;;
-            --bl33) bl33=$(readlink -e "$2"); shift 2 ;;
+            --bl32) bl32=$(find_path "$2"); shift 2 ;;
+            --bl33) bl33=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
-            --config) config=$(readlink -e "$2"); shift 2 ;;
+            --config) config=$(find_path "$2"); shift 2 ;;
             --output) output=$2; shift 2 ;;
             --debug) mode=debug; shift ;;
             --) shift; break ;;

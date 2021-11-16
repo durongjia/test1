@@ -96,7 +96,7 @@ function main {
     while true; do
         case "$1" in
             --build_ab) build_ab=true; shift ;;
-            --config) config=$(readlink -e "$2"); shift 2 ;;
+            --config) config=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
             --debug) mode=debug; shift ;;
             --) shift; break ;;

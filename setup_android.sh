@@ -50,7 +50,7 @@ function main {
 
     while true; do
         case "$1" in
-            --aosp) aosp=$(readlink -e "$2"); shift 2 ;;
+            --aosp) aosp=$(find_path "$2"); shift 2 ;;
             --branch) branch="$2"; shift 2 ;;
             --clean) clean=true; shift ;;
             --) shift; break ;;

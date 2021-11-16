@@ -160,7 +160,7 @@ function main {
 
     while true; do
         case "$1" in
-            --aosp) aosp=$(readlink -e "$2"); shift 2 ;;
+            --aosp) aosp=$(find_path "$2"); shift 2 ;;
             --commit) commit=true; shift ;;
             --silent) silent=true; shift ;;
             --) shift; break ;;
