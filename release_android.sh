@@ -140,6 +140,7 @@ $ $(basename "$0") --aosp=/home/julien/Documents/mediatek/android
 Options:
   --aosp     Android Root path
   --commit   (OPTIONAL) commit binaries in AOSP
+  --config   (OPTIONAL) release ONLY for this board config file
   --silent   (OPTIONAL) silent build commands
 
 The changes specified in the commit msg can be read from:
@@ -151,10 +152,11 @@ DELIM__
 function main {
     local aosp=""
     local commit=false
+    local config=""
     local silent=false
     local mode_list=(debug release)
 
-    local opts_args="aosp:,commit,silent"
+    local opts_args="aosp:,commit,config:,silent"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -162,6 +164,13 @@ function main {
         case "$1" in
             --aosp) aosp=$(find_path "$2"); shift 2 ;;
             --commit) commit=true; shift ;;
+            --config)
+                config=$(find_path "$2")
+                if [ -z "${config}" ]; then
+                    echo "Cannot find board config file"
+                    usage
+                fi
+                shift 2 ;;
             --silent) silent=true; shift ;;
             --) shift; break ;;
             *) usage ;;
@@ -171,7 +180,15 @@ function main {
     # check arguments
     [ -z "${aosp}" ] && echo "Cannot find Android Root Path" && usage
 
-    # build all configs
+    # set configs list
+    declare -a configs
+    if [ -n "${config}" ]; then
+        configs=("${config}")
+    else
+        configs=("${SRC}"/config/boards/*.yaml)
+    fi
+
+    # build configs
     local mtk_binaries_path=""
     local out_dir=""
     declare -A commits_msg
@@ -180,7 +197,7 @@ function main {
 
     pushd "${SRC}"
     for mode in "${mode_list[@]}"; do
-        for mtk_config in config/boards/*.yaml; do
+        for mtk_config in "${configs[@]}"; do
             mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
             out_dir=$(out_dir "${mtk_config}" "${mode}")
 

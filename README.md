@@ -120,5 +120,6 @@ $ release_android.sh --aosp=/home/julien/Documents/mediatek/android
 Options:
   --aosp     Android Root path
   --commit   (OPTIONAL) commit binaries in AOSP
+  --config   (OPTIONAL) release ONLY for this board config file
   --silent   (OPTIONAL) silent build commands
 ```
