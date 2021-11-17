@@ -17,6 +17,7 @@ Options:
   --aosp     Android Root path
   --branch   Branch name
   --clean    (OPTIONAL) clean up AOSP projects
+  --help     (OPTIONAL) display usage
 DELIM__
     exit 1
 }
@@ -44,7 +45,7 @@ function main {
     local branch=""
     local clean=false
 
-    local opts_args="aosp:,branch:,clean"
+    local opts_args="aosp:,branch:,clean,help"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -53,8 +54,8 @@ function main {
             --aosp) aosp=$(find_path "$2"); shift 2 ;;
             --branch) branch="$2"; shift 2 ;;
             --clean) clean=true; shift ;;
+            --help) usage ;;
             --) shift; break ;;
-            *) usage ;;
         esac
     done
 

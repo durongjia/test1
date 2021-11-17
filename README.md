@@ -18,6 +18,7 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --help     (OPTIONAL) display usage
 ```
 
 ## Build libdram
@@ -30,6 +31,7 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --help     (OPTIONAL) display usage
 ```
 
 ## Build little kernel
@@ -42,6 +44,7 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --help     (OPTIONAL) display usage
 ```
 
 ## Build uboot
@@ -55,6 +58,7 @@ Options:
   --build_ab (OPTIONAL) use ab defconfig
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --help     (OPTIONAL) display usage
 ```
 
 ## Build optee
@@ -67,6 +71,7 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --help     (OPTIONAL) display usage
 ```
 
 ## Build fip
@@ -82,6 +87,7 @@ Options:
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --help     (OPTIONAL) display usage
 ```
 
 ## Build ALL
@@ -94,6 +100,7 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --help     (OPTIONAL) display usage
 ```
 
 ## Setup Android
@@ -106,6 +113,7 @@ Options:
   --aosp     Android Root path
   --branch   Branch name
   --clean    (OPTIONAL) clean up AOSP projects
+  --help     (OPTIONAL) display usage
 
 The changes specified in the commit msg can be read from:
 ${BUILD_PATH}/.android_commit_changes
@@ -121,5 +129,6 @@ Options:
   --aosp     Android Root path
   --commit   (OPTIONAL) commit binaries in AOSP
   --config   (OPTIONAL) release ONLY for this board config file
+  --help     (OPTIONAL) display usage
   --silent   (OPTIONAL) silent build commands
 ```

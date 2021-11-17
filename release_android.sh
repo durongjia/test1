@@ -141,6 +141,7 @@ Options:
   --aosp     Android Root path
   --commit   (OPTIONAL) commit binaries in AOSP
   --config   (OPTIONAL) release ONLY for this board config file
+  --help     (OPTIONAL) display usage
   --silent   (OPTIONAL) silent build commands
 
 The changes specified in the commit msg can be read from:
@@ -156,7 +157,7 @@ function main {
     local silent=false
     local mode_list=(debug release)
 
-    local opts_args="aosp:,commit,config:,silent"
+    local opts_args="aosp:,commit,config:,help,silent"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -171,9 +172,9 @@ function main {
                     usage
                 fi
                 shift 2 ;;
+            --help) usage ;;
             --silent) silent=true; shift ;;
             --) shift; break ;;
-            *) usage ;;
         esac
     done
 

@@ -75,6 +75,7 @@ Options:
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --help     (OPTIONAL) display usage
 DELIM__
     exit 1
 }
@@ -87,7 +88,7 @@ function main {
     local output=""
     local mode=""
 
-    local opts_args="bl32:,bl33:,clean,config:,output:,debug"
+    local opts_args="bl32:,bl33:,clean,config:,output:,debug,help"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -99,8 +100,8 @@ function main {
             --config) config=$(find_path "$2"); shift 2 ;;
             --output) output=$2; shift 2 ;;
             --debug) mode=debug; shift ;;
+            --help) usage ;;
             --) shift; break ;;
-            *) usage; break ;;
         esac
     done
 
