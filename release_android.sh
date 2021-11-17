@@ -147,7 +147,6 @@ Options:
 The changes specified in the commit msg can be read from:
 ${SRC}/.android_commit_changes
 DELIM__
-    exit 1
 }
 
 function main {
@@ -167,19 +166,16 @@ function main {
             --commit) commit=true; shift ;;
             --config)
                 config=$(find_path "$2")
-                if [ -z "${config}" ]; then
-                    echo "Cannot find board config file"
-                    usage
-                fi
+                [ -z "${config}" ] && error_exit "Cannot find board config file"
                 shift 2 ;;
-            --help) usage ;;
+            --help) usage; exit 0 ;;
             --silent) silent=true; shift ;;
             --) shift; break ;;
         esac
     done
 
     # check arguments
-    [ -z "${aosp}" ] && echo "Cannot find Android Root Path" && usage
+    [ -z "${aosp}" ] && error_exit "Cannot find Android Root Path"
 
     # set configs list
     declare -a configs

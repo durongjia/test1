@@ -19,7 +19,6 @@ Options:
   --clean    (OPTIONAL) clean up AOSP projects
   --help     (OPTIONAL) display usage
 DELIM__
-    exit 1
 }
 
 function projects_path {
@@ -54,14 +53,14 @@ function main {
             --aosp) aosp=$(find_path "$2"); shift 2 ;;
             --branch) branch="$2"; shift 2 ;;
             --clean) clean=true; shift ;;
-            --help) usage ;;
+            --help) usage; exit 0 ;;
             --) shift; break ;;
         esac
     done
 
     # check arguments
-    [ -z "${aosp}" ] && echo "Cannot find Android Root Path" && usage
-    [ -z "${branch}" ] && echo "Please provide branch name" && usage
+    [ -z "${aosp}" ] && error_exit "Cannot find Android Root Path"
+    [ -z "${branch}" ] && error_exit "Please provide branch name"
 
     declare -a projects
     projects_path projects "${aosp}"

@@ -81,7 +81,6 @@ Options:
   --debug    (OPTIONAL) build bootloader in debug mode
   --help     (OPTIONAL) display usage
 DELIM__
-    exit 1
 }
 
 function main {
@@ -100,13 +99,13 @@ function main {
             --config) config=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
             --debug) mode=debug; shift ;;
-            --help) usage ;;
+            --help) usage; exit 0 ;;
             --) shift; break ;;
         esac
     done
 
     # check arguments
-    [ -z "${config}" ] && echo "Cannot find board config file" && usage
+    [ -z "${config}" ] && error_exit "Cannot find board config file"
 
     # build uboot
     check_env

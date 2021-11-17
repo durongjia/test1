@@ -103,6 +103,12 @@ Options:
   --debug    (OPTIONAL) build bootloader in debug mode
   --help     (OPTIONAL) display usage
 DELIM__
+}
+
+function error_exit {
+    local error="$1"
+    printf "\033[0;31mERROR:\033[0m ${error}\n\n"
+    usage
     exit 1
 }
 
@@ -122,13 +128,13 @@ function main {
             --config) config=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
             --debug) mode=debug; shift ;;
-            --help) usage ;;
+            --help) usage; exit 0 ;;
             --) shift; break ;;
         esac
     done
 
     # check arguments
-    [ -z "${config}" ] && echo "Cannot find board config file" && usage
+    [ -z "${config}" ] && error_exit "Cannot find board config file"
 
     # build
     check_env

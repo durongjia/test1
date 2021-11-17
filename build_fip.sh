@@ -77,7 +77,6 @@ Options:
   --debug    (OPTIONAL) build bootloader in debug mode
   --help     (OPTIONAL) display usage
 DELIM__
-    exit 1
 }
 
 function main {
@@ -100,16 +99,16 @@ function main {
             --config) config=$(find_path "$2"); shift 2 ;;
             --output) output=$2; shift 2 ;;
             --debug) mode=debug; shift ;;
-            --help) usage ;;
+            --help) usage; exit 0 ;;
             --) shift; break ;;
         esac
     done
 
     # check arguments
-    [ -z "${config}" ] && echo "Cannot find board config file" && usage
-    [ -z "${bl32}" ] && echo "Cannot find bl32" && usage
-    [ -z "${bl33}" ] && echo "Cannot find bl33" && usage
-    [ -z "${output}" ] && echo "Please provide fip output name" && usage
+    [ -z "${config}" ] && error_exit "Cannot find board config file"
+    [ -z "${bl32}" ] && error_exit "Cannot find bl32"
+    [ -z "${bl33}" ] && error_exit "Cannot find bl33"
+    [ -z "${output}" ] && error_exit "Please provide fip output name"
 
     # build fip
     check_env
