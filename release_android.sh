@@ -8,7 +8,7 @@ SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/build_all.sh"
 
 PROJECTS_AIOT=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
-               "libdram" "lk" "optee-os" "u-boot" "build")
+               "libdram" "lk" "optee-os" "u-boot" "build" "libbase-prebuilts")
 
 function check_local_changes {
     local projects=("$@")

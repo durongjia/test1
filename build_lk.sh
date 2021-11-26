@@ -26,6 +26,7 @@ function build_lk {
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
     local extra_flags=""
+    local libbase_path="${ROOT}/libbase-prebuilts/${mtk_plat}/libbase-lk.a"
 
     display_current_build "$1" "lk" "${mode}"
 
@@ -33,6 +34,10 @@ function build_lk {
         extra_flags="DEBUG=1"
     else
         extra_flags="DEBUG=0"
+    fi
+
+    if  [ -a "${libbase_path}" ]; then
+        extra_flags+=" LIBBASE=${libbase_path}"
     fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
