@@ -25,29 +25,29 @@ function find_path {
 }
 
 function aarch64_env {
-    export PATH="${TOOLCHAINS}/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH"
-    export CROSS_COMPILE=aarch64-linux-gnu-
+    export PATH="${TOOLCHAINS}/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin:$PATH"
+    export CROSS_COMPILE=aarch64-none-linux-gnu-
 }
 
 function check_aarch64 {
-    if ! [ -d "${TOOLCHAINS}/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu" ]; then
+    if ! [ -d "${TOOLCHAINS}/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu" ]; then
         pushd "${TOOLCHAINS}"
-        wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-linux-gnu/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
-        tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+        wget https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz
+        tar -xvf gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz
         popd
     fi
 }
 
 function arm-none_env {
-    export PATH="${TOOLCHAINS}/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu/bin:$PATH"
-    export CROSS_COMPILE=aarch64-none-linux-gnu-
+    export PATH="${TOOLCHAINS}/gcc-arm-10.3-2021.07-x86_64-aarch64-none-elf/bin:$PATH"
+    export CROSS_COMPILE=aarch64-none-elf-
 }
 
 function check_arm-none {
-    if ! [ -d "${TOOLCHAINS}/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu" ]; then
+    if ! [ -d "${TOOLCHAINS}/gcc-arm-10.3-2021.07-x86_64-aarch64-none-elf" ]; then
         pushd "${TOOLCHAINS}"
-        wget https://developer.arm.com/-/media/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz
-        tar -xvf gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz
+        wget https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-aarch64-none-elf.tar.xz
+        tar -xvf gcc-arm-10.3-2021.07-x86_64-aarch64-none-elf.tar.xz
         popd
     fi
 }
