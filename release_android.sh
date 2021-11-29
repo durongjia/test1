@@ -192,6 +192,8 @@ function main {
 
     check_local_changes "${PROJECTS_AIOT[@]}"
 
+    check_env
+
     pushd "${SRC}"
     for mode in "${mode_list[@]}"; do
         for mtk_config in "${configs[@]}"; do
