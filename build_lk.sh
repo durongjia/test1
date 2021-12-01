@@ -54,8 +54,8 @@ function build_lk {
 
     aarch64_env
 
-    make ARCH_arm64_TOOLCHAIN_PREFIX=aarch64-linux-gnu- CFLAGS="" ${extra_flags} \
-         GLOBAL_CFLAGS="-mstrict-align" SECURE_BOOT_ENABLE=no LIBGCC="" \
+    make ARCH_arm64_TOOLCHAIN_PREFIX=${CROSS_COMPILE} CFLAGS="" ${extra_flags} \
+         GLOBAL_CFLAGS="-mstrict-align -mno-outline-atomics" SECURE_BOOT_ENABLE=no LIBGCC="" \
          LIBDRAM="${libdram_a}" "${mtk_board}"
     cp "build-${mtk_board}/lk.bin" "${out_dir}/lk-${mode}.bin"
 
