@@ -1,0 +1,27 @@
+[binaries]
+c = ['aarch64-none-linux-gnu-gcc', '-mcpu=cortex-a53+crc', '-Wformat', '-Wformat-security', '-Werror=format-security']
+cpp = ['aarch64-none-linux-gnu-g++', '-mcpu=cortex-a53+crc', '-Wformat', '-Wformat-security', '-Werror=format-security']
+ar = 'aarch64-none-linux-gnu-gcc-ar'
+nm = 'aarch64-none-linux-gnu--nm'
+strip = 'aarch64-none-linux-gnu-strip'
+readelf = 'aarch64-none-linux-gnu-readelf'
+pkgconfig = 'pkg-config'
+
+[properties]
+needs_exe_wrapper = true
+c_args = ['-O2', '-pipe', '-g', '-feliminate-unused-debug-types']
+c_link_args = ['-Wl,-O1', '-Wl,--hash-style=gnu', '-Wl,--as-needed', '-fstack-protector-strong', '-Wl,-z,relro,-z,now']
+cpp_args = ['-O2', '-pipe', '-g', '-feliminate-unused-debug-types', '-fvisibility-inlines-hidden']
+cpp_link_args = ['-Wl,-O1', '-Wl,--hash-style=gnu', '-Wl,--as-needed', '-fstack-protector-strong', '-Wl,-z,relro,-z,now']
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+
+[target_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'

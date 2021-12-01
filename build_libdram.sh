@@ -50,7 +50,7 @@ function build_libdram {
     if [[ "${build_for_lk}" == true ]]; then
         extra_flags="-Dlk=true"
     fi
-    meson "${mtk_build}" -Dboard="${mtk_board}" ${extra_flags} --cross-file meson.cross
+    meson "${mtk_build}" -Dboard="${mtk_board}" ${extra_flags} --cross-file ${SRC}/config/libdram/build/meson.cross
     ninja -C "${mtk_build}"
 
     clear_vars
