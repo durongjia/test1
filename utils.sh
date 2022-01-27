@@ -101,6 +101,7 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 DELIM__
 }
@@ -118,8 +119,9 @@ function main {
     local clean=false
     local config=""
     local mode="release"
+    local secure=false
 
-    local opts_args="clean,config:,debug,help"
+    local opts_args="clean,config:,debug,help,secure"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -128,6 +130,7 @@ function main {
             --config) config=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
             --debug) mode=debug; shift ;;
+            --secure) secure=true; shift ;;
             --help) usage; exit 0 ;;
             --) shift; break ;;
         esac
@@ -138,5 +141,5 @@ function main {
 
     # build
     check_env
-    ${build} "${config}" "${clean}" "${mode}"
+    ${build} "${config}" "${clean}" "${mode}" "${secure}"
 }

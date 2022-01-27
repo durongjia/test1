@@ -6,8 +6,10 @@ set -o pipefail
 
 SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
+source "${SRC}/secure.sh"
 
 ATF="${ROOT}/arm-trusted-firmware"
+MBEDTLS="${ROOT}/mbedtls"
 
 function clean_fip {
     local mtk_plat="$1"
@@ -28,6 +30,7 @@ function build_fip {
     local clean="${5:-false}"
     local extra_flags=""
     local mode="${6:-release}"
+    local secure="$7"
     local out_dir=$(out_dir "$1" "${mode}")
 
     display_current_build "$1" "fip" "${mode}"
@@ -36,6 +39,11 @@ function build_fip {
         extra_flags="DEBUG=1 log_level=${log_level} ENABLE_LTO=1"
     else
         extra_flags="DEBUG=0 log_level=0"
+    fi
+
+    if [[ "${secure}" == true ]]; then
+        extra_flags+=" MBEDTLS_DIR=${MBEDTLS} TRUSTED_BOARD_BOOT=1 GENERATE_COT=1"
+        extra_flags+=" ROT_KEY=${KEYS}/${ROT_KEY}"
     fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
@@ -75,6 +83,7 @@ Options:
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
   --debug    (OPTIONAL) build bootloader in debug mode
+  --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 DELIM__
 }
@@ -86,8 +95,9 @@ function main {
     local clean=false
     local output=""
     local mode=""
+    local secure=false
 
-    local opts_args="bl32:,bl33:,clean,config:,output:,debug,help"
+    local opts_args="bl32:,bl33:,clean,config:,output:,debug,help,secure"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -99,6 +109,7 @@ function main {
             --config) config=$(find_path "$2"); shift 2 ;;
             --output) output=$2; shift 2 ;;
             --debug) mode=debug; shift ;;
+            --secure) secure=true; shift ;;
             --help) usage; exit 0 ;;
             --) shift; break ;;
         esac
@@ -112,7 +123,7 @@ function main {
 
     # build fip
     check_env
-    build_fip "${config}" "${bl32}" "${bl33}" "${output}" "${clean}" "${mode}"
+    build_fip "${config}" "${bl32}" "${bl33}" "${output}" "${clean}" "${mode}" "${secure}"
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then

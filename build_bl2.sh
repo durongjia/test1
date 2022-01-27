@@ -7,6 +7,9 @@ set -o pipefail
 SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
 source "${SRC}/build_libdram.sh"
+source "${SRC}/secure.sh"
+
+MBEDTLS="${ROOT}/mbedtls"
 
 function clean_bl2 {
     local mtk_plat="$1"
@@ -23,6 +26,7 @@ function build_bl2 {
     local libdram_a="${LIBDRAM}/build-${mtk_libdram_board}/src/${mtk_plat}/libdram.a"
     local clean="${2:-false}"
     local mode="${3:-release}"
+    local secure="$4"
     local out_dir=$(out_dir "$1" "${mode}")
     local extra_flags=""
     local libbase_path="${ROOT}/libbase-prebuilts/${mtk_plat}/libbase.a"
@@ -37,6 +41,11 @@ function build_bl2 {
 
     if  [ -a "${libbase_path}" ]; then
         extra_flags+=" LIBBASE=${libbase_path}"
+    fi
+
+    if [[ "${secure}" == true ]]; then
+        extra_flags+=" MBEDTLS_DIR=${MBEDTLS} TRUSTED_BOARD_BOOT=1 GENERATE_COT=1"
+        extra_flags+=" ROT_KEY=${KEYS}/${ROT_KEY}"
     fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
