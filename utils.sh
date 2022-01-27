@@ -27,6 +27,7 @@ function find_path {
 function aarch64_env {
     export PATH="${TOOLCHAINS}/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin:$PATH"
     export CROSS_COMPILE=aarch64-none-linux-gnu-
+    export CROSS_COMPILE64=aarch64-none-linux-gnu-
 }
 
 function check_aarch64 {
