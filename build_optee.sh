@@ -22,16 +22,23 @@ function build_optee {
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
-    local platform=""
 
     display_current_build "$1" "optee" "${mode}"
 
-    if [[ "${mode}" == "debug" ]]; then
-        optee_flags+=" DEBUG=1"
-    else
+    # additional flags
+    if [[ "${mode}" == "release" ]]; then
         optee_flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
+    else
+        optee_flags+=" DEBUG=1"
     fi
 
+    if [ -n "${optee_board}" ]; then
+        optee_flags+=" PLATFORM=mediatek-${optee_board}"
+    else
+        optee_flags+=" PLATFORM=mediatek-${mtk_plat}"
+    fi
+
+    # setup env
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
     pushd "${OPTEE}"
@@ -39,12 +46,8 @@ function build_optee {
 
     aarch64_env
 
-    if [ -n "${optee_board}" ]; then
-        platform="mediatek-${optee_board}"
-    else
-        platform="mediatek-${mtk_plat}"
-    fi
-    make -j"$(nproc)" PLATFORM="${platform}" ${optee_flags} all
+    # build tee binary
+    make -j"$(nproc)" ${optee_flags} all
 
     cp out/arm-plat-mediatek/core/tee.bin "${out_dir}/tee-${mode}.bin"
 
