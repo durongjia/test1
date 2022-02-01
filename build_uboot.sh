@@ -6,6 +6,7 @@ set -o pipefail
 
 SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
+source "${SRC}/secure.sh"
 
 UBOOT="${ROOT}/u-boot"
 
@@ -53,10 +54,21 @@ function build_uboot {
     aarch64_env
     export ARCH=arm64
 
+    # generate defconfig
     make "${mtk_defconfig}"
     if [[ "${mode}" == "release" ]]; then
         scripts/kconfig/merge_config.sh .config "${BUILD}/config/defconfig_fragment/uboot-release.config"
+
+        # avb key
+        local avb_pub_key=""
+        get_avb_pub_key "$1" avb_pub_key
+        if [ -n "${avb_pub_key}" ]; then
+            cp "${avb_pub_key}" "${mtk_defconfig}.avbpubkey"
+            avb_pub_key="${mtk_defconfig}.avbpubkey"
+            sed -i 's/^\(CONFIG_AVB_PUBKEY_FILE=\).*/\1\"'${avb_pub_key}'\"/' .config
+        fi
     fi
+
     make -j"$(nproc)"
 
     ./scripts/get_default_envs.sh > "${uboot_out_env}"

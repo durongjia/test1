@@ -9,6 +9,7 @@ source "${SRC}/utils.sh"
 
 KEYS="${BUILD}/.keys"
 ROT_KEY="rot_key.pem"
+AVB_PUB_KEY="avb_pub.pem"
 
 function generate_rot_key {
     ! [ -d "${KEYS}" ] && mkdir -p "${KEYS}"
@@ -32,5 +33,23 @@ function get_rot_key {
             generate_rot_key
         fi
         rot_key_ref="${KEYS}/${ROT_KEY}"
+    fi
+}
+
+function get_avb_pub_key {
+    local avb_pub_key_config=$(config_value "$1" secure.avb_pub_key)
+    local -n avb_pub_key_ref="$2"
+
+    if [ -n "${avb_pub_key_config}" ]; then
+        if [ -a "${avb_pub_key_config}" ]; then
+            avb_pub_key_ref="${avb_pub_key_config}"
+        else
+            echo "AVB key not found: ${avb_pub_key_config}"
+            exit 1
+        fi
+    else
+        if [ -a "${KEYS}/${AVB_PUB_KEY}" ]; then
+            avb_pub_key_ref="${KEYS}/${AVB_PUB_KEY}"
+        fi
     fi
 }
