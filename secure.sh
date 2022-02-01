@@ -53,3 +53,15 @@ function get_avb_pub_key {
         fi
     fi
 }
+
+function generate_avb_keys {
+    local avb_pub_key="${KEYS}/${AVB_PUB_KEY}"
+    local avb_priv_key="${KEYS}/avb_priv.pem"
+
+    ! [ -d "${KEYS}" ] && mkdir -p "${KEYS}"
+
+    openssl genrsa -out "${avb_priv_key}" 4096
+    avbtool extract_public_key --key "${avb_priv_key}" --output "${avb_pub_key}"
+
+    printf "AVB keys generated here:\n%s\n%s\n" "${avb_priv_key}" "${avb_pub_key}"
+}
