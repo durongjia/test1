@@ -96,7 +96,7 @@ function main {
     local config=""
     local clean=false
     local output=""
-    local mode=""
+    local mode="release"
     local secure=false
 
     local opts_args="bl32:,bl33:,clean,config:,output:,debug,help,secure"
