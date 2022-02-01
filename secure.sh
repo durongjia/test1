@@ -65,3 +65,25 @@ function generate_avb_keys {
 
     printf "AVB keys generated here:\n%s\n%s\n" "${avb_priv_key}" "${avb_pub_key}"
 }
+
+# main
+function usage {
+    cat <<DELIM__
+usage: $(basename "$0") function
+
+Functions supported can be found in "$0"
+DELIM__
+}
+
+function main {
+    if ! [ $# -eq 1 ]; then
+        usage
+    else
+        local command="$1"
+        "${command}"
+    fi
+}
+
+if [ "$0" = "$BASH_SOURCE" ]; then
+    main "$@"
+fi

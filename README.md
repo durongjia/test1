@@ -135,3 +135,10 @@ Options:
   --help     (OPTIONAL) display usage
   --silent   (OPTIONAL) silent build commands
 ```
+
+## Secure
+``` {.sh}
+usage: secure.sh function
+
+Functions supported can be found in secure.sh
+```
