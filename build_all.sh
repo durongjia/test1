@@ -22,10 +22,6 @@ function build_all {
         rm -rf "${out_dir}"
     fi
 
-    if [[ "${secure}" == true ]]; then
-        generate_rot_key_if_unavailable
-    fi
-
     # bl2
     build_bl2 "$@"
 

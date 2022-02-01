@@ -42,8 +42,10 @@ function build_fip {
     fi
 
     if [[ "${secure}" == true ]]; then
+        local rot_key=""
+        get_rot_key "$1" rot_key
         extra_flags+=" MBEDTLS_DIR=${MBEDTLS} TRUSTED_BOARD_BOOT=1 GENERATE_COT=1"
-        extra_flags+=" ROT_KEY=${KEYS}/${ROT_KEY}"
+        extra_flags+=" ROT_KEY=${rot_key}"
     fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
