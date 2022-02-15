@@ -20,6 +20,7 @@ function build_uboot {
     local mode="${4:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
     local build="uboot"
+    local defconfig_fragment="${BUILD}/config/defconfig_fragment/uboot-${mode}.config"
 
     local mtk_defconfig=""
     local uboot_out_bin=""
@@ -56,9 +57,11 @@ function build_uboot {
 
     # generate defconfig
     make "${mtk_defconfig}"
-    if [[ "${mode}" == "release" ]]; then
-        scripts/kconfig/merge_config.sh .config "${BUILD}/config/defconfig_fragment/uboot-release.config"
+    if [ -a "${defconfig_fragment}" ]; then
+        scripts/kconfig/merge_config.sh .config "${defconfig_fragment}"
+    fi
 
+    if [[ "${mode}" == "release" ]]; then
         # avb key
         local avb_pub_key=""
         get_avb_pub_key "$1" avb_pub_key
