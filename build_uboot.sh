@@ -61,8 +61,8 @@ function build_uboot {
         scripts/kconfig/merge_config.sh .config "${defconfig_fragment}"
     fi
 
-    if [[ "${mode}" == "release" ]]; then
-        # avb key
+    # avb key only on release/factory
+    if ! [[ "${mode}" == "debug" ]]; then
         local avb_pub_key=""
         get_avb_pub_key "$1" avb_pub_key
         if [ -n "${avb_pub_key}" ]; then
