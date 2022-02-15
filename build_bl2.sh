@@ -46,7 +46,7 @@ function build_bl2 {
         extra_flags+=" LIBBASE=${libbase_path}"
     fi
 
-    if [[ "${secure}" == true ]]; then
+    if [[ "${mode}" == "factory" ]]; then
         local rot_key=""
         get_rot_key "$1" rot_key
         extra_flags+=" MBEDTLS_DIR=${MBEDTLS} TRUSTED_BOARD_BOOT=1 GENERATE_COT=1"
