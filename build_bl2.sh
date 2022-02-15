@@ -28,6 +28,7 @@ function build_bl2 {
     local mode="${3:-release}"
     local secure="$4"
     local out_dir=$(out_dir "$1" "${mode}")
+    local bl2_out_dir=""
     local extra_flags=""
     local libbase_path="${ROOT}/libbase-prebuilts/${mtk_plat}/libbase.a"
 
@@ -35,8 +36,10 @@ function build_bl2 {
 
     if [[ "${mode}" == "debug" ]]; then
         extra_flags="DEBUG=1"
+        bl2_out_dir="build/${mtk_plat}/debug"
     else
         extra_flags="DEBUG=0"
+        bl2_out_dir="build/${mtk_plat}/release"
     fi
 
     if  [ -a "${libbase_path}" ]; then
@@ -66,7 +69,7 @@ function build_bl2 {
 
     make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" LIBDRAM="${libdram_a}" ${extra_flags} bl2
 
-    pushd "build/${mtk_plat}/${mode}"
+    pushd "${bl2_out_dir}"
     cp bl2.bin bl2.img.tmp
     truncate -s%4 bl2.img.tmp
 

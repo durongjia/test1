@@ -17,7 +17,7 @@ $ build_bl2.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 ```
@@ -31,7 +31,7 @@ $ build_libdram.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage
 ```
 
@@ -44,7 +44,7 @@ $ build_lk.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage
 ```
 
@@ -58,7 +58,7 @@ Options:
   --config   Mediatek board config file
   --build_ab (OPTIONAL) use ab defconfig
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage
 ```
 
@@ -71,7 +71,7 @@ $ build_optee.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage
 ```
 
@@ -87,7 +87,7 @@ Options:
   --bl33     Path to bl33 binary
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 ```
@@ -101,7 +101,7 @@ $ build_all.sh --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 ```

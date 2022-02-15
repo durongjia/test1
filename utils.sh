@@ -4,6 +4,7 @@ BUILD=$(dirname "$(readlink -e "$0")")
 ROOT=$(readlink -e "${BUILD}/../")
 OUT="${ROOT}/out"
 TOOLCHAINS="${ROOT}/toolchains"
+MODES=("release" "debug" "factory")
 
 INIT_PATH=$PATH
 
@@ -101,7 +102,7 @@ $ $(basename "$0") --config=i500-pumpkin.yaml
 Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 DELIM__
@@ -122,7 +123,7 @@ function main {
     local mode="release"
     local secure=false
 
-    local opts_args="clean,config:,debug,help,secure"
+    local opts_args="clean,config:,help,mode:,secure"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -130,7 +131,7 @@ function main {
         case "$1" in
             --config) config=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
-            --debug) mode=debug; shift ;;
+            --mode) mode="$2"; shift 2 ;;
             --secure) secure=true; shift ;;
             --help) usage; exit 0 ;;
             --) shift; break ;;
@@ -139,6 +140,7 @@ function main {
 
     # check arguments
     [ -z "${config}" ] && error_exit "Cannot find board config file"
+    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_exit "${mode} mode not supported"
 
     # build
     check_env

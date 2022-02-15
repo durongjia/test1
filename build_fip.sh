@@ -32,13 +32,16 @@ function build_fip {
     local mode="${6:-release}"
     local secure="$7"
     local out_dir=$(out_dir "$1" "${mode}")
+    local fip_out_dir=""
 
     display_current_build "$1" "fip" "${mode}"
 
     if [[ "${mode}" == "debug" ]]; then
         extra_flags="DEBUG=1 log_level=${log_level} ENABLE_LTO=1"
+        fip_out_dir="build/${mtk_plat}/debug"
     else
         extra_flags="DEBUG=0 log_level=0"
+        fip_out_dir="build/${mtk_plat}/release"
     fi
 
     if [[ "${secure}" == true ]]; then
@@ -65,7 +68,7 @@ function build_fip {
     make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" BL32="${bl32_bin}" BL33="${bl33_bin}" \
          LIBDRAM="${libdram_a}" ${extra_flags} SPD=opteed NEED_BL32=yes NEED_BL33=yes bl31 fip
 
-    cp "build/${mtk_plat}/${mode}/fip.bin" "${out_dir}/${fip_bin}"
+    cp "${fip_out_dir}/fip.bin" "${out_dir}/${fip_bin}"
 
     clear_vars
     popd
@@ -84,7 +87,7 @@ Options:
   --bl33     Path to bl33 binary
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 DELIM__
@@ -99,7 +102,7 @@ function main {
     local mode="release"
     local secure=false
 
-    local opts_args="bl32:,bl33:,clean,config:,output:,debug,help,secure"
+    local opts_args="bl32:,bl33:,clean,config:,output:,help,mode:,secure"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -110,7 +113,7 @@ function main {
             --clean) clean=true; shift ;;
             --config) config=$(find_path "$2"); shift 2 ;;
             --output) output=$2; shift 2 ;;
-            --debug) mode=debug; shift ;;
+            --mode) mode="$2"; shift 2 ;;
             --secure) secure=true; shift ;;
             --help) usage; exit 0 ;;
             --) shift; break ;;
@@ -122,6 +125,7 @@ function main {
     [ -z "${bl32}" ] && error_exit "Cannot find bl32"
     [ -z "${bl33}" ] && error_exit "Cannot find bl33"
     [ -z "${output}" ] && error_exit "Please provide fip output name"
+    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_exit "${mode} mode not supported"
 
     # build fip
     check_env

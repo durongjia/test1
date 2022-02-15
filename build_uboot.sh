@@ -90,7 +90,7 @@ Options:
   --config   Mediatek board config file
   --build_ab (OPTIONAL) use ab defconfig
   --clean    (OPTIONAL) clean before build
-  --debug    (OPTIONAL) build bootloader in debug mode
+  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage
 DELIM__
 }
@@ -99,9 +99,9 @@ function main {
     local build_ab=false
     local clean=false
     local config=""
-    local mode=""
+    local mode="release"
 
-    local opts_args="build_ab,clean,config:,debug,help"
+    local opts_args="build_ab,clean,config:,mode:,help"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -110,7 +110,7 @@ function main {
             --build_ab) build_ab=true; shift ;;
             --config) config=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
-            --debug) mode=debug; shift ;;
+            --mode) mode="$2"; shift 2 ;;
             --help) usage; exit 0 ;;
             --) shift; break ;;
         esac
@@ -118,6 +118,7 @@ function main {
 
     # check arguments
     [ -z "${config}" ] && error_exit "Cannot find board config file"
+    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_exit "${mode} mode not supported"
 
     # build uboot
     check_env
