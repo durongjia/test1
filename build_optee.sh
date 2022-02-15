@@ -37,11 +37,16 @@ function build_optee {
     display_current_build "$1" "optee" "${mode}"
 
     # additional flags
-    if [[ "${mode}" == "release" ]]; then
-        optee_flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
-    else
-        optee_flags+=" DEBUG=1"
-    fi
+    case "${mode}" in
+        "release") optee_flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n" ;;
+        "debug") optee_flags+=" DEBUG=1" ;;
+        "factory")
+            optee_flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
+
+            # RPMB
+            optee_flags+=" CFG_RPMB_FS=y CFG_RPMB_WRITE_KEY=y"
+            ;;
+    esac
 
     if [ -n "${optee_board}" ]; then
         optee_flags+=" PLATFORM=mediatek-${optee_board}"
