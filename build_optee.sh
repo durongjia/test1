@@ -45,6 +45,9 @@ function build_optee {
 
             # RPMB
             optee_flags+=" CFG_RPMB_FS=y CFG_RPMB_WRITE_KEY=y"
+
+            # AVB TA
+            optee_flags+=" CFG_IN_TREE_EARLY_TAS=avb/023f8f1a-292a-432b-8fc4-de8471358067"
             ;;
     esac
 
