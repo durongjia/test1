@@ -30,7 +30,6 @@ function build_fip {
     local clean="${5:-false}"
     local extra_flags=""
     local mode="${6:-release}"
-    local secure="$7"
     local out_dir=$(out_dir "$1" "${mode}")
     local fip_out_dir=""
 
@@ -88,7 +87,6 @@ Options:
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
   --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
-  --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 DELIM__
 }
@@ -100,9 +98,8 @@ function main {
     local clean=false
     local output=""
     local mode="release"
-    local secure=false
 
-    local opts_args="bl32:,bl33:,clean,config:,output:,help,mode:,secure"
+    local opts_args="bl32:,bl33:,clean,config:,output:,help,mode:"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -114,7 +111,6 @@ function main {
             --config) config=$(find_path "$2"); shift 2 ;;
             --output) output=$2; shift 2 ;;
             --mode) mode="$2"; shift 2 ;;
-            --secure) secure=true; shift ;;
             --help) usage; exit 0 ;;
             --) shift; break ;;
         esac
@@ -129,7 +125,7 @@ function main {
 
     # build fip
     check_env
-    build_fip "${config}" "${bl32}" "${bl33}" "${output}" "${clean}" "${mode}" "${secure}"
+    build_fip "${config}" "${bl32}" "${bl33}" "${output}" "${clean}" "${mode}"
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then

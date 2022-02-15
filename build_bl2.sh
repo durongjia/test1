@@ -26,7 +26,6 @@ function build_bl2 {
     local libdram_a="${LIBDRAM}/build-${mtk_libdram_board}/src/${mtk_plat}/libdram.a"
     local clean="${2:-false}"
     local mode="${3:-release}"
-    local secure="$4"
     local out_dir=$(out_dir "$1" "${mode}")
     local bl2_out_dir=""
     local extra_flags=""

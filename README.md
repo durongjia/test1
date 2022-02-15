@@ -18,7 +18,6 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
   --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
-  --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 ```
 
@@ -88,7 +87,6 @@ Options:
   --output   Output name of fip binary
   --clean    (OPTIONAL) clean before build
   --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
-  --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 ```
 
@@ -102,7 +100,6 @@ Options:
   --config   Mediatek board config file
   --clean    (OPTIONAL) clean before build
   --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
-  --secure   (OPTIONAL) build secure bootloader
   --help     (OPTIONAL) display usage
 ```
 
