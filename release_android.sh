@@ -124,7 +124,7 @@ function copy_binaries {
     local mtk_out="$1"
     local mtk_android_out="$2"
     local mode="$4"
-    local binaries=("bl2-${mode}.img" "fip_${mode}_ab.bin" "fip_${mode}_noab.bin" "lk-${mode}.bin")
+    local binaries=("bl2-${mode}.img" "fip_${mode}.bin" "lk-${mode}.bin")
 
     for binary in "${binaries[@]}"; do
         cp "${mtk_out}${binary}" "${mtk_android_out}"

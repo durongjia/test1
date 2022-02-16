@@ -51,11 +51,10 @@ Options:
 ``` {.sh}
 usage: build_uboot.sh [options]
 
-$ build_uboot.sh --config=i500-pumpkin.yaml --build_ab
+$ build_uboot.sh --config=i500-pumpkin.yaml
 
 Options:
   --config   Mediatek board config file
-  --build_ab (OPTIONAL) use ab defconfig
   --clean    (OPTIONAL) clean before build
   --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage

@@ -28,21 +28,14 @@ function build_all {
     build_lk "$@"
 
     # uboot
-    build_uboot "$1" "$2" false "$3"
-
-    # uboot build ab
-    build_uboot "$1" "$2" true "$3"
+    build_uboot "$1" "$2" "$3"
 
     # optee
     build_optee "$@"
 
     # fip
     build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}.bin" \
-              "fip_${mode}_noab.bin" "${clean}" "${mode}"
-
-    # fip ab
-    build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}-ab.bin" \
-              "fip_${mode}_ab.bin" "${clean}" "${mode}"
+              "fip_${mode}.bin" "${clean}" "${mode}"
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then

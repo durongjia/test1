@@ -16,34 +16,21 @@ function clean_uboot {
 
 function build_uboot {
     local clean="${2:-false}"
-    local build_ab="${3:-false}"
-    local mode="${4:-release}"
+    local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
-    local build="uboot"
     local defconfig_fragment="${BUILD}/config/defconfig_fragment/uboot-${mode}.config"
 
     local mtk_defconfig=""
     local uboot_out_bin=""
     local uboot_out_env=""
-    if [[ "${build_ab}" == true ]]; then
-        mtk_defconfig=$(config_value "$1" uboot.ab_defconfig)
-        uboot_out_bin="${out_dir}/u-boot-${mode}-ab.bin"
-        uboot_out_env="${out_dir}/u-boot-initial-${mode}-env_ab"
-        build="uboot ab"
-    else
-        mtk_defconfig=$(config_value "$1" uboot.defconfig)
-        uboot_out_bin="${out_dir}/u-boot-${mode}.bin"
-        uboot_out_env="${out_dir}/u-boot-initial-${mode}-env_noab"
-    fi
+    mtk_defconfig=$(config_value "$1" uboot.defconfig)
+    uboot_out_bin="${out_dir}/u-boot-${mode}.bin"
+    uboot_out_env="${out_dir}/u-boot-initial-${mode}-env"
 
-    display_current_build "$1" "${build}" "${mode}"
+    display_current_build "$1" "uboot" "${mode}"
 
     if [ -z "${mtk_defconfig}" ]; then
-        if [[ "${build_ab}" == true ]]; then
-            echo "uboot: skip build, ab_defconfig not provided"
-        else
-            echo "uboot: skip build, defconfig not provided"
-        fi
+        echo "uboot: skip build, defconfig not provided"
         return
     fi
 
@@ -87,11 +74,10 @@ function usage {
     cat <<DELIM__
 usage: $(basename "$0") [options]
 
-$ $(basename "$0") --config=i500-pumpkin.yaml --build_ab
+$ $(basename "$0") --config=i500-pumpkin.yaml
 
 Options:
   --config   Mediatek board config file
-  --build_ab (OPTIONAL) use ab defconfig
   --clean    (OPTIONAL) clean before build
   --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage
@@ -99,18 +85,16 @@ DELIM__
 }
 
 function main {
-    local build_ab=false
     local clean=false
     local config=""
     local mode="release"
 
-    local opts_args="build_ab,clean,config:,mode:,help"
+    local opts_args="clean,config:,mode:,help"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
     while true; do
         case "$1" in
-            --build_ab) build_ab=true; shift ;;
             --config) config=$(find_path "$2"); shift 2 ;;
             --clean) clean=true; shift ;;
             --mode) mode="$2"; shift 2 ;;
@@ -125,7 +109,7 @@ function main {
 
     # build uboot
     check_env
-    build_uboot "${config}" "${clean}" "${build_ab}" "${mode}"
+    build_uboot "${config}" "${clean}" "${mode}"
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then

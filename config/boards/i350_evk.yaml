@@ -15,8 +15,7 @@ optee:
   flags: CFG_ARM64_core=y ta-targets=ta_arm64 CFG_DRAM_SIZE=0xc0000000 CFG_CORE_HEAP_SIZE=131072
 
 uboot:
-  defconfig: mt8365_pumpkin_android_defconfig
-  ab_defconfig: mt8365_pumpkin_android_ab_defconfig
+  defconfig: mt8365_pumpkin_android_ab_defconfig
 
 fip:
   cflags: -DNEED_BL32
