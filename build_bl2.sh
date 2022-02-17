@@ -5,9 +5,9 @@ set -u
 set -o pipefail
 
 SRC=$(dirname "$(readlink -e "$0")")
-source "${SRC}/utils.sh"
 source "${SRC}/build_libdram.sh"
 source "${SRC}/secure.sh"
+source "${SRC}/utils.sh"
 
 MBEDTLS="${ROOT}/mbedtls"
 
