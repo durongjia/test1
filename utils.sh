@@ -74,21 +74,26 @@ function config_value {
     cat "$1" | shyaml --quiet get-value "$2"
 }
 
-function out_dir {
+function board_name {
     local yaml_config=$(basename "$1")
+    echo "${yaml_config%.yaml}"
+}
+
+function out_dir {
+    local board=$(board_name "$1")
     local mode="${2:-release}"
 
-    echo "${OUT}/${yaml_config%.yaml}/${mode}"
+    echo "${OUT}/${board}/${mode}"
 }
 
 function display_current_build {
-    local yaml_config=$(basename "$1")
+    local board=$(board_name "$1")
     local build="$2"
     local mode="$3"
 
     printf "\n"
     printf "%0.s-" {1..20}
-    printf "> Build %s: %s - %s <" "${build}" "${yaml_config%.yaml}" "${mode}"
+    printf "> Build %s: %s - %s <" "${build}" "${board}" "${mode}"
     printf "%0.s-" {1..20}
     printf "\n"
 }
