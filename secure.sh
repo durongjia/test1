@@ -7,7 +7,14 @@ set -o pipefail
 SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/utils.sh"
 
+SECURE_TOOLS="${ROOT}/mtk-secure-boot-tools"
 KEYS="${BUILD}/.keys"
+SECURE="${BUILD}/config/secure"
+
+# Secure: BL1 to BL2
+EFUSE_KEY="efuse.pem"
+
+# Secure: BL2 to fip images
 ROT_KEY="rot_key.pem"
 
 # Android Verified Boot (AVB)
@@ -84,6 +91,96 @@ function generate_avb_keys {
     printf "AVB keys generated here:\n%s\n%s\n" "${avb_key}" "${avb_pub_key}"
 }
 
+function generate_efuse_key {
+    ! [ -d "${KEYS}" ] && mkdir -p "${KEYS}"
+    openssl genrsa -out "${KEYS}/${EFUSE_KEY}" 2048
+}
+
+function check_efuse_key {
+    if [ -a "${KEYS}/${EFUSE_KEY}" ]; then
+        echo "EFUSE key found: ${KEYS}/${EFUSE_KEY}"
+    else
+        echo "EFUSE key not found, generate new one ..."
+        generate_efuse_key
+    fi
+}
+
+function secure_boot_supported {
+    local board="$1"
+    [ -d "${SECURE}/${board}" ]
+}
+
+function sign_bl2_image {
+    local board="$1"
+    local input="$2"
+    local output="$3"
+    local pbp_py="${SECURE_TOOLS}/sign-image_v2/pbp.py"
+    local hdr_tool_py="${SECURE_TOOLS}/secure_chip_tools/dev-info-hdr-tool.py"
+    local key_ini="${SECURE}/key.ini"
+    local pl_gfh="${SECURE}/${board}/pl_gfh_config_pss.ini"
+
+    pushd "${KEYS}"
+
+    check_efuse_key
+
+    # update key.ini with efuse key
+    cp "${key_ini}" key.ini
+    sed -i 's|EFUSE_KEY|'${KEYS}/${EFUSE_KEY}'|g' key.ini
+
+    python2.7 "${pbp_py}" -i key.ini -g "${pl_gfh}" -func sign -o "${output}" "${input}"
+    python2.7 "${hdr_tool_py}" emmc "${output}" "${output}"
+    rm key.ini
+
+    popd
+}
+
+function get_efuse_pub_key {
+    local -n ref_efuse_pub_key="$1"
+    local der_extractor="${SECURE_TOOLS}/sign-image_v2/der_extractor/der_extractor"
+    local efuse_pub_key="${EFUSE_KEY}_pub.der"
+    local efuse_key_h="efuse_key.h"
+
+    # public efuse key
+    openssl rsa -in "${KEYS}/${EFUSE_KEY}" -out "${efuse_pub_key}" -outform DER --pubout
+
+    # header file
+    chmod +x "${der_extractor}"
+    "${der_extractor}" "${efuse_pub_key}" "${efuse_key_h}" ANDROID_SBC
+
+    # extract public key
+    ref_efuse_pub_key=$(cat "${efuse_key_h}" | perl -0777 -ne '$_=$1 if /(?:PUBK\s+)(.*(\\)?\n)+#endif/s; s/([\\\n, ]|0x)//g; print')
+
+    rm "${efuse_pub_key}" "${efuse_key_h}"
+}
+
+function update_efuse_xml {
+    local board="$1"
+    local pub_key_n=""
+
+    cp "${SECURE}/${board}/efuse.xml" efuse.xml
+
+    # fill public key
+    get_efuse_pub_key pub_key_n
+    sed -i 's/EFUSE_PUB_KEY/'${pub_key_n}'/' efuse.xml
+}
+
+function add_secure_boot_files {
+    local package="$1"
+    local board="$2"
+
+    # add efuse configuration
+    update_efuse_xml "${board}"
+    zip -ju "${package}" efuse.xml
+    rm efuse.xml
+
+    # add efuse private key
+    zip -ju "${package}" "${KEYS}/${EFUSE_KEY}"
+
+    # add secure board files
+    zip -ju "${package}" "${SECURE}/${board}/${board}_android_scatter.txt"
+    zip -ju "${package}" "${SECURE}/${board}/${board}_preloader.bin"
+}
+
 function generate_secure_package {
     local board=$(board_name "$1")
     local out_dir="$2"
@@ -107,6 +204,13 @@ function generate_secure_package {
     get_avb_pub_key "$1" avb_pub_key
     if [ -n "${avb_pub_key}" ]; then
         zip -ju "${package}" "${avb_pub_key}"
+    fi
+
+    # add Secure Boot files
+    if $(secure_boot_supported "${board}"); then
+        add_secure_boot_files "${package}" "${board}"
+    else
+        warning "Secure boot not supported for ${board}"
     fi
 
     mv "${package}" "${out_dir}/"

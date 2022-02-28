@@ -18,7 +18,19 @@ function clean_bl2 {
     fi
 }
 
+function bl2_create_image {
+    local bl2_tmp="bl2.img.tmp"
+
+    cp bl2.bin "${bl2_tmp}"
+    truncate -s%4 "${bl2_tmp}"
+    "${SRC}/mkimage" -T mtk_image -a 0x201000 -e 0x201000 -n "media=emmc;aarch64=1" \
+                     -d "${bl2_tmp}" bl2.img
+
+    rm "${bl2_tmp}"
+}
+
 function build_bl2 {
+    local board=$(board_name "$1")
     local mtk_plat=$(config_value "$1" plat)
     local atf_project=$(config_value "$1" bl2.project)
     local mtk_cflags=$(config_value "$1" bl2.cflags)
@@ -69,13 +81,11 @@ function build_bl2 {
     make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" LIBDRAM="${libdram_a}" ${extra_flags} bl2
 
     pushd "${bl2_out_dir}"
-    cp bl2.bin bl2.img.tmp
-    truncate -s%4 bl2.img.tmp
-
-    "${SRC}/mkimage" -T mtk_image -a 0x201000 -e 0x201000 -n "media=emmc;aarch64=1" \
-                     -d bl2.img.tmp bl2.img
-
-    rm bl2.img.tmp
+    if [[ "${mode}" == "factory" ]] && $(secure_boot_supported "${board}"); then
+        sign_bl2_image "${board}" "${PWD}/bl2.bin" "${PWD}/bl2.img"
+    else
+        bl2_create_image
+    fi
     cp bl2.img "${out_dir}/bl2-${mode}.img"
     popd
 
