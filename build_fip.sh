@@ -20,6 +20,7 @@ function clean_fip {
 
 function build_fip {
     local mtk_plat=$(config_value "$1" plat)
+    local atf_project=$(config_value "$1" bl2.project)
     local mtk_cflags=$(config_value "$1" fip.cflags)
     local log_level=$(config_value "$1" fip.log_level)
     local mtk_libdram_board=$(config_value "$1" libdram.board)
@@ -59,7 +60,7 @@ function build_fip {
         ! [ -a "${libdram_a}" ] && build_libdram "$1" false false "${mode}"
     fi
 
-    pushd "${ATF}"
+    pushd "${ROOT}/${atf_project}"
     [[ "${clean}" == true ]] && clean_fip "${mtk_plat}"
 
     arm-none_env
