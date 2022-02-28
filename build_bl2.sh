@@ -41,7 +41,7 @@ function build_bl2 {
         bl2_out_dir="build/${mtk_plat}/release"
     fi
 
-    if  [ -a "${libbase_path}" ]; then
+    if [ -a "${libbase_path}" ]; then
         extra_flags+=" LIBBASE=${libbase_path}"
     fi
 

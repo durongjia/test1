@@ -36,7 +36,7 @@ function build_lk {
         extra_flags="DEBUG=0"
     fi
 
-    if  [ -a "${libbase_path}" ]; then
+    if [ -a "${libbase_path}" ]; then
         extra_flags+=" LIBBASE=${libbase_path}"
     fi
 
