@@ -112,6 +112,11 @@ Options:
 DELIM__
 }
 
+function warning {
+    local warning="$1"
+    printf "\033[0;33mWARNING:\033[0m ${warning}\n\n"
+}
+
 function error {
     local error="$1"
     printf "\033[0;31mERROR:\033[0m ${error}\n\n"
