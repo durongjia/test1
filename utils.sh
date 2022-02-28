@@ -107,9 +107,18 @@ Options:
 DELIM__
 }
 
-function error_exit {
+function error {
     local error="$1"
     printf "\033[0;31mERROR:\033[0m ${error}\n\n"
+}
+
+function error_exit {
+    error "$1"
+    exit 1
+}
+
+function error_usage_exit {
+    error "$1"
     usage
     exit 1
 }
@@ -136,8 +145,8 @@ function main {
     done
 
     # check arguments
-    [ -z "${config}" ] && error_exit "Cannot find board config file"
-    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_exit "${mode} mode not supported"
+    [ -z "${config}" ] &&  error_usage_exit "Cannot find board config file"
+    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_usage_exit "${mode} mode not supported"
 
     # build
     check_env

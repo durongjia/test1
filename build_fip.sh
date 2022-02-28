@@ -117,11 +117,11 @@ function main {
     done
 
     # check arguments
-    [ -z "${config}" ] && error_exit "Cannot find board config file"
-    [ -z "${bl32}" ] && error_exit "Cannot find bl32"
-    [ -z "${bl33}" ] && error_exit "Cannot find bl33"
-    [ -z "${output}" ] && error_exit "Please provide fip output name"
-    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_exit "${mode} mode not supported"
+    [ -z "${config}" ] && error_usage_exit "Cannot find board config file"
+    [ -z "${bl32}" ] && error_usage_exit "Cannot find bl32"
+    [ -z "${bl33}" ] && error_usage_exit "Cannot find bl33"
+    [ -z "${output}" ] && error_usage_exit "Please provide fip output name"
+    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_usage_exit "${mode} mode not supported"
 
     # build fip
     check_env

@@ -59,8 +59,8 @@ function main {
     done
 
     # check arguments
-    [ -z "${aosp}" ] && error_exit "Cannot find Android Root Path"
-    [ -z "${branch}" ] && error_exit "Please provide branch name"
+    [ -z "${aosp}" ] && error_usage_exit "Cannot find Android Root Path"
+    [ -z "${branch}" ] && error_usage_exit "Please provide branch name"
 
     declare -a projects
     projects_path projects "${aosp}"
@@ -76,8 +76,7 @@ function main {
 
         # check local changes
         if ! git diff-index --quiet HEAD; then
-            echo "error: Local changes detected"
-            exit 1
+            error_exit "error: Local changes detected"
         fi
 
         # check if branch exist

@@ -16,8 +16,7 @@ function check_local_changes {
     for project in "${projects[@]}"; do
         pushd "${ROOT}/${project}"
         if ! git diff-index --quiet HEAD; then
-            echo "Local changes detected in: ${project}"
-            exit 1
+            error_exit "Local changes detected in: ${project}"
         fi
         popd
     done
@@ -166,7 +165,7 @@ function main {
             --commit) commit=true; shift ;;
             --config)
                 config=$(find_path "$2")
-                [ -z "${config}" ] && error_exit "Cannot find board config file"
+                [ -z "${config}" ] && error_usage_exit "Cannot find board config file"
                 shift 2 ;;
             --help) usage; exit 0 ;;
             --silent) silent=true; shift ;;
@@ -175,7 +174,7 @@ function main {
     done
 
     # check arguments
-    [ -z "${aosp}" ] && error_exit "Cannot find Android Root Path"
+    [ -z "${aosp}" ] && error_usage_exit "Cannot find Android Root Path"
 
     # set configs list
     declare -a configs
@@ -211,8 +210,7 @@ function main {
                 copy_binaries "${out_dir}/" "${aosp}/${mtk_binaries_path}" "${mtk_config}" "${mode}"
                 add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
             else
-                echo "ERROR: cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
-                exit 1
+                error_exit "ERROR: cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
             fi
         done
     done

@@ -104,8 +104,8 @@ function main {
     done
 
     # check arguments
-    [ -z "${config}" ] && error_exit "Cannot find board config file"
-    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_exit "${mode} mode not supported"
+    [ -z "${config}" ] && error_usage_exit "Cannot find board config file"
+    ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_usage_exit "${mode} mode not supported"
 
     # build uboot
     check_env

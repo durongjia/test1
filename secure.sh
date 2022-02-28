@@ -24,8 +24,7 @@ function get_rot_key {
         if [ -a "${rot_key_config}" ]; then
             rot_key_ref="${rot_key_config}"
         else
-            echo "ROT key not found: ${rot_key_config}"
-            exit 1
+            error_exit "ROT key not found: ${rot_key_config}"
         fi
     else
         if ! [ -a "${KEYS}/${ROT_KEY}" ]; then
@@ -44,8 +43,7 @@ function get_avb_pub_key {
         if [ -a "${avb_pub_key_config}" ]; then
             avb_pub_key_ref="${avb_pub_key_config}"
         else
-            echo "AVB key not found: ${avb_pub_key_config}"
-            exit 1
+            error_exit "AVB public key not found: ${avb_pub_key_config}"
         fi
     else
         if [ -a "${KEYS}/${AVB_PUB_KEY}" ]; then
