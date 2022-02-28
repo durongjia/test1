@@ -84,6 +84,36 @@ function generate_avb_keys {
     printf "AVB keys generated here:\n%s\n%s\n" "${avb_key}" "${avb_pub_key}"
 }
 
+function generate_secure_package {
+    local board=$(board_name "$1")
+    local out_dir="$2"
+    local package="secure_${board}.zip"
+    local rot_key=""
+    local avb_key=""
+    local avb_pub_key=""
+
+    pushd "${KEYS}"
+    [ -a "${package}" ] && rm "${package}"
+
+    # add Root Of Trust key
+    get_rot_key "$1" rot_key
+    zip -ju "${package}" "${rot_key}"
+
+    # add Android Verified Boot keys
+    get_avb_key "$1" avb_key
+    if [ -n "${avb_key}" ]; then
+        zip -ju "${package}" "${avb_key}"
+    fi
+    get_avb_pub_key "$1" avb_pub_key
+    if [ -n "${avb_pub_key}" ]; then
+        zip -ju "${package}" "${avb_pub_key}"
+    fi
+
+    mv "${package}" "${out_dir}/"
+
+    popd
+}
+
 # main
 function usage {
     cat <<DELIM__

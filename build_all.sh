@@ -13,6 +13,7 @@ source "${SRC}/build_uboot.sh"
 source "${SRC}/utils.sh"
 
 function build_all {
+    local board=$(board_name "$1")
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
@@ -36,6 +37,11 @@ function build_all {
     # fip
     build_fip "$1" "${out_dir}/tee-${mode}.bin" "${out_dir}/u-boot-${mode}.bin" \
               "fip_${mode}.bin" "${clean}" "${mode}"
+
+    # secure package
+    if [[ "${mode}" == "factory" ]]; then
+        generate_secure_package "$1" "${out_dir}"
+    fi
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
