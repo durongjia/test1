@@ -6,6 +6,7 @@ set -o pipefail
 
 SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/secure.sh"
+source "${SRC}/build_libhwid.sh"
 source "${SRC}/utils.sh"
 
 ATF="${ROOT}/arm-trusted-firmware"
@@ -25,6 +26,7 @@ function build_fip {
     local log_level=$(config_value "$1" fip.log_level)
     local mtk_libdram_board=$(config_value "$1" libdram.board)
     local libdram_a="${LIBDRAM}/build-${mtk_libdram_board}/src/${mtk_plat}/libdram.a"
+    local libhwid_a="${LIBHWID}/build-${mtk_plat}/libhwid.a"
     local bl32_bin="$2"
     local bl33_bin="$3"
     local fip_bin="$4"
@@ -60,13 +62,21 @@ function build_fip {
         ! [ -a "${libdram_a}" ] && build_libdram "$1" false false "${mode}"
     fi
 
+    if [[ "${clean}" == true ]]; then
+        build_libhwid "$1" true false "${mode}"
+    else
+        # check if libhwid has been compiled
+        ! [ -a "${libhwid_a}" ] && build_libhwid "$1" false false "${mode}"
+    fi
+
     pushd "${ROOT}/${atf_project}"
     [[ "${clean}" == true ]] && clean_fip "${mtk_plat}"
 
     arm-none_env
 
     make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" BL32="${bl32_bin}" BL33="${bl33_bin}" \
-         LIBDRAM="${libdram_a}" ${extra_flags} SPD=opteed NEED_BL32=yes NEED_BL33=yes bl31 fip
+         LIBDRAM="${libdram_a}" LIBDEVINFO="${libhwid_a}" ${extra_flags} SPD=opteed \
+         NEED_BL32=yes NEED_BL33=yes bl31 fip
 
     cp "${fip_out_dir}/fip.bin" "${out_dir}/${fip_bin}"
 
