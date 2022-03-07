@@ -13,6 +13,9 @@ SECURE="${BUILD}/config/secure"
 
 # Secure: BL1 to BL2
 EFUSE_KEY="efuse.pem"
+DA_KEY="da.pem"
+MTK_DA_SIGNED="MTK_AllInOne_DA_signed.bin"
+AUTH_KEY="auth_sv5.auth"
 
 # Secure: BL2 to fip images
 ROT_KEY="rot_key.pem"
@@ -105,9 +108,31 @@ function check_efuse_key {
     fi
 }
 
+function generate_da_key {
+    ! [ -d "${KEYS}" ] && mkdir -p "${KEYS}"
+    openssl genrsa -out "${KEYS}/${DA_KEY}" 2048
+}
+
+function check_da_key {
+    if [ -a "${KEYS}/${DA_KEY}" ]; then
+        echo "Download Agent key found: ${KEYS}/${DA_KEY}"
+    else
+        echo "Download Agent key not found, generate new one ..."
+        generate_da_key
+    fi
+}
+
 function secure_boot_supported {
     local board="$1"
     [ -d "${SECURE}/${board}" ]
+}
+
+function daa_supported {
+    local board="$1"
+    local toolauth_gfh_config_pss="${SECURE}/${board}/toolauth_gfh_config_pss.ini"
+    local bbchips_pss="${SECURE}/${board}/bbchips_pss.ini"
+
+    [ -a "${toolauth_gfh_config_pss}" ] && [ -a "${bbchips_pss}" ]
 }
 
 function sign_bl2_image {
@@ -132,6 +157,39 @@ function sign_bl2_image {
     rm key.ini
 
     popd
+}
+
+function resign_da {
+    local board="$1"
+    local mtk_plat="$2"
+    local resign_da_py="${SECURE_TOOLS}/secure_chip_tools/resign_da.py"
+    local bbchips_pss="${SECURE}/${board}/bbchips_pss.ini"
+    local mtk_all_da="${SECURE}/MTK_AllInOne_DA_Win.bin"
+
+    # update bbchips_pss.ini with download agent key
+    cp "${bbchips_pss}" bbchips_pss.ini
+    sed -i 's|DA_KEY|'${KEYS}/${DA_KEY}'|g' bbchips_pss.ini
+
+    python2.7 "${resign_da_py}" "${mtk_all_da}" "${mtk_plat^^}" bbchips_pss.ini all "${MTK_DA_SIGNED}"
+    rm bbchips_pss.ini
+}
+
+function generate_auth_file {
+    local board="$1"
+    local toolauth_py="${SECURE_TOOLS}/secure_chip_tools/toolauth.py"
+    local toolauth_gfh_config_pss="${SECURE}/${board}/toolauth_gfh_config_pss.ini"
+    local key_ini="${SECURE}/key.ini"
+
+    # update key.ini with efuse key
+    cp "${key_ini}" key.ini
+    sed -i 's|EFUSE_KEY|'${KEYS}/${EFUSE_KEY}'|g' key.ini
+
+    # update toolauth_gfh_config_pss.ini with download agent key
+    cp "${toolauth_gfh_config_pss}" toolauth_gfh_config_pss.ini
+    sed -i 's|DA_KEY|'${KEYS}/${DA_KEY}'|g' toolauth_gfh_config_pss.ini
+
+    python2.7 "${toolauth_py}" -i key.ini -g toolauth_gfh_config_pss.ini "${AUTH_KEY}"
+    rm key.ini toolauth_gfh_config_pss.ini
 }
 
 function get_efuse_pub_key {
@@ -167,6 +225,7 @@ function update_efuse_xml {
 function add_secure_boot_files {
     local package="$1"
     local board="$2"
+    local mtk_plat="$3"
 
     # add efuse configuration
     update_efuse_xml "${board}"
@@ -179,10 +238,30 @@ function add_secure_boot_files {
     # add secure board files
     zip -ju "${package}" "${SECURE}/${board}/${board}_android_scatter.txt"
     zip -ju "${package}" "${SECURE}/${board}/${board}_preloader.bin"
+
+    # Download Agent Authentification
+    if daa_supported "${board}"; then
+        # Download Agent key
+        check_da_key
+        zip -ju "${package}" "${DA_KEY}"
+
+        # MTK_AllInOne_DA signed
+        resign_da "${board}" "${mtk_plat}"
+        zip -ju "${package}" "${MTK_DA_SIGNED}"
+        rm "${MTK_DA_SIGNED}"
+
+        # authentication file
+        generate_auth_file "${board}"
+        zip -ju "${package}" "${AUTH_KEY}"
+        rm "${AUTH_KEY}"
+    else
+        warning "DAA not supported for ${board}"
+    fi
 }
 
 function generate_secure_package {
     local board=$(board_name "$1")
+    local mtk_plat=$(config_value "$1" plat)
     local out_dir="$2"
     local package="secure_${board}.zip"
     local rot_key=""
@@ -208,7 +287,7 @@ function generate_secure_package {
 
     # add Secure Boot files
     if secure_boot_supported "${board}"; then
-        add_secure_boot_files "${package}" "${board}"
+        add_secure_boot_files "${package}" "${board}" "${mtk_plat}"
     else
         warning "Secure boot not supported for ${board}"
     fi
