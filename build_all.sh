@@ -13,7 +13,6 @@ source "${SRC}/build_uboot.sh"
 source "${SRC}/utils.sh"
 
 function build_all {
-    local board=$(board_name "$1")
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
