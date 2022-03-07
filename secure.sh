@@ -207,7 +207,7 @@ function generate_secure_package {
     fi
 
     # add Secure Boot files
-    if $(secure_boot_supported "${board}"); then
+    if secure_boot_supported "${board}"; then
         add_secure_boot_files "${package}" "${board}"
     else
         warning "Secure boot not supported for ${board}"

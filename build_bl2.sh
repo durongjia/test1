@@ -81,7 +81,7 @@ function build_bl2 {
     make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" LIBDRAM="${libdram_a}" ${extra_flags} bl2
 
     pushd "${bl2_out_dir}"
-    if [[ "${mode}" == "factory" ]] && $(secure_boot_supported "${board}"); then
+    if [[ "${mode}" == "factory" ]] && secure_boot_supported "${board}"; then
         sign_bl2_image "${board}" "${PWD}/bl2.bin" "${PWD}/bl2.img"
     else
         bl2_create_image
