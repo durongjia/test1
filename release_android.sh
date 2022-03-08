@@ -126,7 +126,7 @@ function copy_binaries {
     local binaries=("bl2-${mode}.img" "fip_${mode}.bin" "lk-${mode}.bin")
 
     for binary in "${binaries[@]}"; do
-        cp "${mtk_out}${binary}" "${mtk_android_out}"
+        cp "${mtk_out}/${binary}" "${mtk_android_out}"
     done
 }
 
@@ -207,7 +207,7 @@ function main {
             fi
 
             if [ -d "${aosp}/${mtk_binaries_path}" ]; then
-                copy_binaries "${out_dir}/" "${aosp}/${mtk_binaries_path}" "${mtk_config}" "${mode}"
+                copy_binaries "${out_dir}" "${aosp}/${mtk_binaries_path}" "${mtk_config}" "${mode}"
                 add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
             else
                 error_exit "ERROR: cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
