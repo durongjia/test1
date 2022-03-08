@@ -8,7 +8,8 @@ SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/build_all.sh"
 
 PROJECTS_AIOT=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
-               "libdram" "lk" "optee-os" "u-boot" "build" "libbase-prebuilts")
+               "libdram" "lk" "optee-os" "u-boot" "build" "libbase-prebuilts"
+               "optee-ta/kmgk" "optee-ta/optee-otp")
 
 function check_local_changes {
     local projects=("$@")
@@ -194,8 +195,8 @@ function main {
     check_env
 
     pushd "${SRC}"
-    for mode in "${mode_list[@]}"; do
-        for mtk_config in "${configs[@]}"; do
+    for mtk_config in "${configs[@]}"; do
+        for mode in "${mode_list[@]}"; do
             mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
             out_dir=$(out_dir "${mtk_config}" "${mode}")
 
@@ -213,6 +214,14 @@ function main {
                 error_exit "ERROR: cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
             fi
         done
+
+        # Trusted Applications
+        if [[ "${silent}" == true ]]; then
+            build_android_ta "${mtk_config}" "true" "release" &> /dev/null
+        else
+            build_android_ta "${mtk_config}" "true" "release"
+        fi
+        cp -r "${out_dir}/optee-ta" "${aosp}/${mtk_binaries_path}"
     done
     popd
 
