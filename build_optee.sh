@@ -70,6 +70,11 @@ function build_optee {
 
     get_optee_flags "$1" "${mode}" optee_flags
 
+    # OTP TA
+    if [[ "${mode}" == "factory" ]]; then
+        early_ta_paths+=("optee-ta/optee-otp/ta/3712bdda-569f-4940-b749-fb3b06a5fd86.elf")
+    fi
+
     # setup env
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
 
