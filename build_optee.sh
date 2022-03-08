@@ -27,38 +27,48 @@ function build_ta {
     popd
 }
 
+function get_optee_flags {
+    local mtk_plat=$(config_value "$1" plat)
+    local flags=$(config_value "$1" optee.flags)
+    local board=$(config_value "$1" optee.board)
+    local mode="$2"
+    local -n optee_flags_ref="$3"
+
+    # additional flags
+    case "${mode}" in
+        "release") flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n" ;;
+        "debug") flags+=" DEBUG=1" ;;
+        "factory")
+            flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
+
+            # RPMB
+            flags+=" CFG_RPMB_FS=y CFG_RPMB_WRITE_KEY=y"
+
+            # AVB TA
+            flags+=" CFG_IN_TREE_EARLY_TAS=avb/023f8f1a-292a-432b-8fc4-de8471358067"
+    esac
+
+    if [ -n "${board}" ]; then
+        flags+=" PLATFORM=mediatek-${board}"
+    else
+        flags+=" PLATFORM=mediatek-${mtk_plat}"
+    fi
+
+    optee_flags_ref="${flags}"
+}
+
 function build_optee {
     local mtk_plat=$(config_value "$1" plat)
-    local optee_flags=$(config_value "$1" optee.flags)
-    local optee_board=$(config_value "$1" optee.board)
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
+    local optee_flags=""
     local optee_out_dir="${OPTEE}/out/arm-plat-mediatek"
     local early_ta_paths=($(config_value "$1" optee.early_ta_paths))
 
     display_current_build "$1" "optee" "${mode}"
 
-    # additional flags
-    case "${mode}" in
-        "release") optee_flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n" ;;
-        "debug") optee_flags+=" DEBUG=1" ;;
-        "factory")
-            optee_flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
-
-            # RPMB
-            optee_flags+=" CFG_RPMB_FS=y CFG_RPMB_WRITE_KEY=y"
-
-            # AVB TA
-            optee_flags+=" CFG_IN_TREE_EARLY_TAS=avb/023f8f1a-292a-432b-8fc4-de8471358067"
-            ;;
-    esac
-
-    if [ -n "${optee_board}" ]; then
-        optee_flags+=" PLATFORM=mediatek-${optee_board}"
-    else
-        optee_flags+=" PLATFORM=mediatek-${mtk_plat}"
-    fi
+    get_optee_flags "$1" "${mode}" optee_flags
 
     # setup env
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
