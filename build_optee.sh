@@ -16,10 +16,13 @@ function clean_optee {
 }
 
 function build_ta {
-    local optee_flags="$1"
-    local ta_dir=$(dirname "$2")
+    local clean="$1"
+    local optee_flags="$2"
+    local ta_dir=$(dirname "$3")
 
     pushd "${ta_dir}"
+    echo "-> Build Trusted Application: ${ta_dir}"
+    [[ "${clean}" == true ]] && make clean
     make -j"$(nproc)" ${optee_flags}
     popd
 }
@@ -72,7 +75,7 @@ function build_optee {
 
         early_ta_paths=("${early_ta_paths[@]/#/${ROOT}/}")
         for early_ta in "${early_ta_paths[@]}"; do
-            build_ta "${optee_flags}" "${early_ta}"
+            build_ta "${clean}" "${optee_flags}" "${early_ta}"
             optee_flags+=" EARLY_TA_PATHS+=${early_ta}"
         done
     fi
