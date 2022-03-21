@@ -6,6 +6,7 @@ set -o pipefail
 
 SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/build_libdram.sh"
+source "${SRC}/secure.sh"
 source "${SRC}/utils.sh"
 
 LK="${ROOT}/lk"
@@ -57,7 +58,11 @@ function build_lk {
     make ARCH_arm64_TOOLCHAIN_PREFIX=${CROSS_COMPILE} CFLAGS="" ${extra_flags} \
          GLOBAL_CFLAGS="-mstrict-align -mno-outline-atomics" SECURE_BOOT_ENABLE=no LIBGCC="" \
          LIBDRAM="${libdram_a}" "${mtk_board}"
+
     cp "build-${mtk_board}/lk.bin" "${out_dir}/lk-${mode}.bin"
+    if [[ "${mode}" == "factory" ]]; then
+        sign_lk_image "build-${mtk_board}/lk.bin" "${out_dir}/lk-${mode}.sign"
+    fi
 
     clear_vars
     popd

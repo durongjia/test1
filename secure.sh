@@ -159,6 +159,19 @@ function sign_bl2_image {
     popd
 }
 
+function sign_lk_image {
+    local input="$1"
+    local output="$2"
+    local input_digest="lk_digest"
+
+    check_da_key
+
+    cat "${input}" | openssl dgst -binary -sha256 > "${input_digest}"
+    openssl pkeyutl -sign -inkey "${KEYS}/${DA_KEY}" -in "${input_digest}" -out "${output}" -pkeyopt digest:sha256 -pkeyopt rsa_padding_mode:pss -pkeyopt rsa_pss_saltlen:32
+
+    rm "${input_digest}"
+}
+
 function resign_da {
     local board="$1"
     local mtk_plat="$2"
