@@ -211,7 +211,7 @@ function main {
                 copy_binaries "${out_dir}" "${aosp}/${mtk_binaries_path}" "${mtk_config}" "${mode}"
                 add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
             else
-                error_exit "ERROR: cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
+                error_exit "cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
             fi
         done
 
