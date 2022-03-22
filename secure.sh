@@ -292,18 +292,18 @@ function generate_secure_package {
     local secure_config=$(get_secure_config "$1")
     local out_dir="$2"
     local package="secure_${board}.zip"
-    local rot_key=""
-    local avb_key=""
-    local avb_pub_key=""
 
     pushd "${KEYS}"
     [ -a "${package}" ] && rm "${package}"
 
     # add Root Of Trust key
+    local rot_key=""
     get_rot_key "$1" rot_key
     zip -ju "${package}" "${rot_key}"
 
     # add Android Verified Boot keys
+    local avb_key=""
+    local avb_pub_key=""
     get_avb_key "$1" avb_key
     if [ -n "${avb_key}" ]; then
         zip -ju "${package}" "${avb_key}"
