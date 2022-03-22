@@ -5,6 +5,7 @@ set -u
 set -o pipefail
 
 SRC=$(dirname "$(readlink -e "$0")")
+source "${SRC}/secure.sh"
 source "${SRC}/utils.sh"
 
 OPTEE="${ROOT}/optee-os"
@@ -40,6 +41,14 @@ function get_optee_flags {
         "debug") flags+=" DEBUG=1" ;;
         "factory")
             flags+=" DEBUG=0 CFG_TEE_CORE_LOG_LEVEL=0 CFG_UART_ENABLE=n"
+
+            # sign TA
+            local ta_key=""
+            local ta_pub_key=""
+            get_ta_keys "$1" ta_key ta_pub_key
+            if [ -n "${ta_key}" ] && [ -n "${ta_pub_key}" ]; then
+                flags+=" TA_SIGN_KEY=${ta_key} TA_PUBLIC_KEY=${ta_pub_key}"
+            fi
 
             # RPMB
             flags+=" CFG_RPMB_FS=y CFG_RPMB_WRITE_KEY=y"
