@@ -75,7 +75,7 @@ function build_fip {
     arm-none_env
 
     make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" BL32="${bl32_bin}" BL33="${bl33_bin}" \
-         LIBDRAM="${libdram_a}" LIBDEVINFO="${libhwid_a}" ${extra_flags} SPD=opteed \
+         LIBDRAM="${libdram_a}" LIBBASE="${libhwid_a}" ${extra_flags} SPD=opteed \
          NEED_BL32=yes NEED_BL33=yes bl31 fip
 
     cp "${fip_out_dir}/fip.bin" "${out_dir}/${fip_bin}"
