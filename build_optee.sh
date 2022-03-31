@@ -48,6 +48,8 @@ function get_optee_flags {
             flags+=" CFG_IN_TREE_EARLY_TAS=avb/023f8f1a-292a-432b-8fc4-de8471358067"
     esac
 
+    flags+=" CFG_TZDRAM_START=0x43200000 CFG_TZDRAM_SIZE=0x00a00000"
+
     if [ -n "${board}" ]; then
         flags+=" PLATFORM=mediatek-${board}"
     else
