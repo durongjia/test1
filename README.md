@@ -96,7 +96,7 @@ Options:
   --config   Mediatek board config file
   --bl32     Path to bl32 binary
   --bl33     Path to bl33 binary
-  --output   Output name of fip binary
+  --output   (OPTIONAL) Output name of fip binary
   --clean    (OPTIONAL) clean before build
   --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage

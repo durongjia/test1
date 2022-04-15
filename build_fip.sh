@@ -96,7 +96,7 @@ Options:
   --config   Mediatek board config file
   --bl32     Path to bl32 binary
   --bl33     Path to bl33 binary
-  --output   Output name of fip binary
+  --output   (OPTIONAL) Output name of fip binary
   --clean    (OPTIONAL) clean before build
   --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
   --help     (OPTIONAL) display usage
@@ -132,8 +132,10 @@ function main {
     [ -z "${config}" ] && error_usage_exit "Cannot find board config file"
     [ -z "${bl32}" ] && error_usage_exit "Cannot find bl32"
     [ -z "${bl33}" ] && error_usage_exit "Cannot find bl33"
-    [ -z "${output}" ] && error_usage_exit "Please provide fip output name"
     ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_usage_exit "${mode} mode not supported"
+    if [ -z "${output}" ]; then
+        output="fip-${mode}.bin"
+    fi
 
     # build fip
     check_env
