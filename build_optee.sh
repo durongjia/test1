@@ -67,11 +67,17 @@ function build_android_ta {
     local kmgk="optee-ta/kmgk"
     local xtest="optee-ta/optee_test/ta"
     local optee_flags=""
+    local ta_paths=($(config_value "$1" optee.ta_paths))
     declare -a android_ta_paths
 
     display_current_build "$1" "android Trusted Applications" "${mode}"
 
     get_optee_flags "$1" "${mode}" optee_flags
+
+    # ta from config
+    if [ "${#ta_paths[@]}" -gt 0 ]; then
+        android_ta_paths+=("${ta_paths[@]}")
+    fi
 
     # gatekeeper
     android_ta_paths+=("${kmgk}/gatekeeper/ta/4d573443-6a56-4272-ac6f-2425af9ef9bb.ta")
