@@ -23,11 +23,11 @@ function build_lk {
     local mtk_board=$(config_value "$1" lk.board)
     local mtk_libdram_board=$(config_value "$1" libdram.board)
     local libdram_a="${LIBDRAM}/build-${mtk_libdram_board}-lk/src/${mtk_plat}/libdram.a"
+    local libbase_a="${ROOT}/libbase-prebuilts/${mtk_plat}/libbase-lk.a"
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
     local extra_flags=""
-    local libbase_path="${ROOT}/libbase-prebuilts/${mtk_plat}/libbase-lk.a"
 
     display_current_build "$1" "lk" "${mode}"
 
@@ -35,10 +35,6 @@ function build_lk {
         extra_flags="DEBUG=1"
     else
         extra_flags="DEBUG=0"
-    fi
-
-    if [ -a "${libbase_path}" ]; then
-        extra_flags+=" LIBBASE=${libbase_path}"
     fi
 
     ! [ -d "${out_dir}" ] && mkdir -p "${out_dir}"
@@ -57,7 +53,7 @@ function build_lk {
 
     make ARCH_arm64_TOOLCHAIN_PREFIX=${CROSS_COMPILE} CFLAGS="" ${extra_flags} \
          GLOBAL_CFLAGS="-mstrict-align -mno-outline-atomics" SECURE_BOOT_ENABLE=no LIBGCC="" \
-         LIBDRAM="${libdram_a}" "${mtk_board}"
+         LIBDRAM="${libdram_a}" LIBBASE="${libbase_a}" "${mtk_board}"
 
     cp "build-${mtk_board}/lk.bin" "${out_dir}/lk-${mode}.bin"
     if [[ "${mode}" == "factory" ]]; then

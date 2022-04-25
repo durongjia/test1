@@ -36,12 +36,12 @@ function build_bl2 {
     local mtk_cflags=$(config_value "$1" bl2.cflags)
     local mtk_libdram_board=$(config_value "$1" libdram.board)
     local libdram_a="${LIBDRAM}/build-${mtk_libdram_board}/src/${mtk_plat}/libdram.a"
+    local libbase_a="${ROOT}/libbase-prebuilts/${mtk_plat}/libbase.a"
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
     local bl2_out_dir=""
     local extra_flags=""
-    local libbase_path="${ROOT}/libbase-prebuilts/${mtk_plat}/libbase.a"
 
     display_current_build "$1" "bl2" "${mode}"
 
@@ -51,10 +51,6 @@ function build_bl2 {
     else
         extra_flags="DEBUG=0"
         bl2_out_dir="build/${mtk_plat}/release"
-    fi
-
-    if [ -a "${libbase_path}" ]; then
-        extra_flags+=" LIBBASE=${libbase_path}"
     fi
 
     if [[ "${mode}" == "factory" ]]; then
@@ -78,7 +74,8 @@ function build_bl2 {
 
     aarch64_env
 
-    make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" LIBDRAM="${libdram_a}" ${extra_flags} bl2
+    make E=0 CFLAGS="${mtk_cflags}" PLAT="${mtk_plat}" LIBDRAM="${libdram_a}" \
+         LIBBASE="${libbase_a}" ${extra_flags} bl2
 
     pushd "${bl2_out_dir}"
     if [[ "${mode}" == "factory" ]] && secure_boot_supported "${board}"; then
