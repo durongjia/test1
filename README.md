@@ -34,19 +34,6 @@ Options:
   --help     (OPTIONAL) display usage
 ```
 
-## Build libhwid
-``` {.sh}
-usage: build_libhwid.sh [options]
-
-$ build_libhwid.sh --config=i500-pumpkin.yaml
-
-Options:
-  --config   Mediatek board config file
-  --clean    (OPTIONAL) clean before build
-  --mode     (OPTIONAL) [release|debug|factory] mode (default: release)
-  --help     (OPTIONAL) display usage
-```
-
 ## Build little kernel
 ``` {.sh}
 usage: build_lk.sh [options]
