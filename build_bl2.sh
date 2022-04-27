@@ -30,7 +30,6 @@ function bl2_create_image {
 }
 
 function build_bl2 {
-    local board=$(board_name "$1")
     local mtk_plat=$(config_value "$1" plat)
     local atf_project=$(config_value "$1" bl2.project)
     local mtk_cflags=$(config_value "$1" bl2.cflags)
@@ -40,6 +39,7 @@ function build_bl2 {
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
+    local secure_config=$(get_secure_config "$1")
     local bl2_out_dir=""
     local extra_flags=""
 
@@ -78,8 +78,8 @@ function build_bl2 {
          LIBBASE="${libbase_a}" ${extra_flags} bl2
 
     pushd "${bl2_out_dir}"
-    if [[ "${mode}" == "factory" ]] && secure_boot_supported "${board}"; then
-        sign_bl2_image "${board}" "${PWD}/bl2.bin" "${PWD}/bl2.img"
+    if [[ "${mode}" == "factory" ]] && [ -n "${secure_config}" ]; then
+        sign_bl2_image "${secure_config}" "${PWD}/bl2.bin" "${PWD}/bl2.img"
     else
         bl2_create_image
     fi

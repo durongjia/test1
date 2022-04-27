@@ -9,7 +9,6 @@ source "${SRC}/utils.sh"
 
 SECURE_TOOLS="${ROOT}/mtk-secure-boot-tools"
 KEYS="${BUILD}/.keys"
-SECURE="${BUILD}/config/secure"
 
 # Secure: BL1 to BL2
 EFUSE_KEY="efuse.pem"
@@ -23,6 +22,25 @@ ROT_KEY="rot_key.pem"
 # Android Verified Boot (AVB)
 AVB_KEY="avb.pem"
 AVB_PUB_KEY="avb_pub.pem"
+
+function get_secure_config {
+    local board=$(board_name "$1")
+    local secure_config=""
+
+    if [ -d "${SECURE_TOOLS}/configs/${board}" ]; then
+        secure_config="${SECURE_TOOLS}/configs/${board}";
+    else
+        local customer_config=$(config_value "$1" customer_config)
+        if [ -n "${customer_config}" ]; then
+            local customer_secure="${ROOT}/${customer_config}/secure/${board}"
+            if [ -d "${customer_secure}" ]; then
+                secure_config="${customer_secure}";
+            fi
+        fi
+    fi
+
+    echo "${secure_config}"
+}
 
 function generate_rot_key {
     ! [ -d "${KEYS}" ] && mkdir -p "${KEYS}"
@@ -122,27 +140,22 @@ function check_da_key {
     fi
 }
 
-function secure_boot_supported {
-    local board="$1"
-    [ -d "${SECURE}/${board}" ]
-}
-
 function daa_supported {
-    local board="$1"
-    local toolauth_gfh_config_pss="${SECURE}/${board}/toolauth_gfh_config_pss.ini"
-    local bbchips_pss="${SECURE}/${board}/bbchips_pss.ini"
+    local secure_config="$1"
+    local toolauth_gfh_config_pss="${secure_config}/toolauth_gfh_config_pss.ini"
+    local bbchips_pss="${secure_config}/bbchips_pss.ini"
 
     [ -a "${toolauth_gfh_config_pss}" ] && [ -a "${bbchips_pss}" ]
 }
 
 function sign_bl2_image {
-    local board="$1"
+    local secure_config="$1"
     local input="$2"
     local output="$3"
     local pbp_py="${SECURE_TOOLS}/sign-image_v2/pbp.py"
     local hdr_tool_py="${SECURE_TOOLS}/secure_chip_tools/dev-info-hdr-tool.py"
-    local key_ini="${SECURE}/key.ini"
-    local pl_gfh="${SECURE}/${board}/pl_gfh_config_pss.ini"
+    local key_ini="${SECURE_TOOLS}/configs/key.ini"
+    local pl_gfh="${secure_config}/pl_gfh_config_pss.ini"
 
     pushd "${KEYS}"
 
@@ -173,11 +186,11 @@ function sign_lk_image {
 }
 
 function resign_da {
-    local board="$1"
+    local secure_config="$1"
     local mtk_plat="$2"
     local resign_da_py="${SECURE_TOOLS}/secure_chip_tools/resign_da.py"
-    local bbchips_pss="${SECURE}/${board}/bbchips_pss.ini"
-    local mtk_all_da="${SECURE}/MTK_AllInOne_DA_Win.bin"
+    local bbchips_pss="${secure_config}/bbchips_pss.ini"
+    local mtk_all_da="${SECURE_TOOLS}/configs/MTK_AllInOne_DA_Win.bin"
 
     # update bbchips_pss.ini with download agent key
     cp "${bbchips_pss}" bbchips_pss.ini
@@ -188,10 +201,10 @@ function resign_da {
 }
 
 function generate_auth_file {
-    local board="$1"
+    local secure_config="$1"
     local toolauth_py="${SECURE_TOOLS}/secure_chip_tools/toolauth.py"
-    local toolauth_gfh_config_pss="${SECURE}/${board}/toolauth_gfh_config_pss.ini"
-    local key_ini="${SECURE}/key.ini"
+    local toolauth_gfh_config_pss="${secure_config}/toolauth_gfh_config_pss.ini"
+    local key_ini="${SECURE_TOOLS}/configs/key.ini"
 
     # update key.ini with efuse key
     cp "${key_ini}" key.ini
@@ -225,10 +238,10 @@ function get_efuse_pub_key {
 }
 
 function update_efuse_xml {
-    local board="$1"
+    local secure_config="$1"
     local pub_key_n=""
 
-    cp "${SECURE}/${board}/efuse.xml" efuse.xml
+    cp "${secure_config}/efuse.xml" efuse.xml
 
     # fill public key
     get_efuse_pub_key pub_key_n
@@ -237,11 +250,12 @@ function update_efuse_xml {
 
 function add_secure_boot_files {
     local package="$1"
-    local board="$2"
-    local mtk_plat="$3"
+    local secure_config="$2"
+    local board="$3"
+    local mtk_plat="$4"
 
     # add efuse configuration
-    update_efuse_xml "${board}"
+    update_efuse_xml "${secure_config}"
     zip -ju "${package}" efuse.xml
     rm efuse.xml
 
@@ -249,22 +263,22 @@ function add_secure_boot_files {
     zip -ju "${package}" "${KEYS}/${EFUSE_KEY}"
 
     # add secure board files
-    zip -ju "${package}" "${SECURE}/${board}/${board}_android_scatter.txt"
-    zip -ju "${package}" "${SECURE}/${board}/${board}_preloader.bin"
+    zip -ju "${package}" "${secure_config}/${board}_android_scatter.txt"
+    zip -ju "${package}" "${secure_config}/${board}_preloader.bin"
 
     # Download Agent Authentification
-    if daa_supported "${board}"; then
+    if daa_supported "${secure_config}"; then
         # Download Agent key
         check_da_key
         zip -ju "${package}" "${DA_KEY}"
 
         # MTK_AllInOne_DA signed
-        resign_da "${board}" "${mtk_plat}"
+        resign_da "${secure_config}" "${mtk_plat}"
         zip -ju "${package}" "${MTK_DA_SIGNED}"
         rm "${MTK_DA_SIGNED}"
 
         # authentication file
-        generate_auth_file "${board}"
+        generate_auth_file "${secure_config}"
         zip -ju "${package}" "${AUTH_KEY}"
         rm "${AUTH_KEY}"
     else
@@ -275,6 +289,7 @@ function add_secure_boot_files {
 function generate_secure_package {
     local board=$(board_name "$1")
     local mtk_plat=$(config_value "$1" plat)
+    local secure_config=$(get_secure_config "$1")
     local out_dir="$2"
     local package="secure_${board}.zip"
     local rot_key=""
@@ -299,8 +314,8 @@ function generate_secure_package {
     fi
 
     # add Secure Boot files
-    if secure_boot_supported "${board}"; then
-        add_secure_boot_files "${package}" "${board}" "${mtk_plat}"
+    if [ -n "${secure_config}" ]; then
+        add_secure_boot_files "${package}" "${secure_config}" "${board}" "${mtk_plat}"
     else
         warning "Secure boot not supported for ${board}"
     fi
