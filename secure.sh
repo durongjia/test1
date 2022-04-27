@@ -152,8 +152,8 @@ function sign_bl2_image {
     cp "${key_ini}" key.ini
     sed -i 's|EFUSE_KEY|'${KEYS}/${EFUSE_KEY}'|g' key.ini
 
-    python2.7 "${pbp_py}" -i key.ini -g "${pl_gfh}" -func sign -o "${output}" "${input}"
-    python2.7 "${hdr_tool_py}" emmc "${output}" "${output}"
+    python "${pbp_py}" -i key.ini -g "${pl_gfh}" -func sign -o "${output}" "${input}"
+    python "${hdr_tool_py}" emmc "${output}" "${output}"
     rm key.ini
 
     popd
@@ -183,7 +183,7 @@ function resign_da {
     cp "${bbchips_pss}" bbchips_pss.ini
     sed -i 's|DA_KEY|'${KEYS}/${DA_KEY}'|g' bbchips_pss.ini
 
-    python2.7 "${resign_da_py}" "${mtk_all_da}" "${mtk_plat^^}" bbchips_pss.ini all "${MTK_DA_SIGNED}"
+    python "${resign_da_py}" "${mtk_all_da}" "${mtk_plat^^}" bbchips_pss.ini all "${MTK_DA_SIGNED}"
     rm bbchips_pss.ini
 }
 
@@ -201,7 +201,7 @@ function generate_auth_file {
     cp "${toolauth_gfh_config_pss}" toolauth_gfh_config_pss.ini
     sed -i 's|DA_KEY|'${KEYS}/${DA_KEY}'|g' toolauth_gfh_config_pss.ini
 
-    python2.7 "${toolauth_py}" -i key.ini -g toolauth_gfh_config_pss.ini "${AUTH_KEY}"
+    python "${toolauth_py}" -i key.ini -g toolauth_gfh_config_pss.ini "${AUTH_KEY}"
     rm key.ini toolauth_gfh_config_pss.ini
 }
 
