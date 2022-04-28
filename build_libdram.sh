@@ -9,15 +9,27 @@ source "${SRC}/utils.sh"
 
 LIBDRAM="${ROOT}/libdram"
 
+function get_libdram_customer {
+    local customer_config=$(config_value "$1" customer_config)
+    local mtk_board="$2"
+    local libdram_customer=""
+
+    if [ -n "${customer_config}" ]; then
+        local libdram="${ROOT}/${customer_config}/libdram/${mtk_board}"
+        if [ -e "${libdram}" ]; then
+            libdram_customer="${libdram}";
+        fi
+    fi
+
+    echo "${libdram_customer}"
+}
+
 function clean_libdram {
     local mtk_build="$1"
     local mtk_board="$2"
-    local libdram_config="$3"
 
     [ -d "${mtk_build}" ] && rm -r "${mtk_build}"
-    if [ -e "${libdram_config}" ] && [ -d "boards/${mtk_board}/" ]; then
-        rm -r "boards/${mtk_board}/"
-    fi
+    [ -d "boards/${mtk_board}" ] && rm -r "boards/${mtk_board}"
 }
 
 function build_libdram {
@@ -26,7 +38,7 @@ function build_libdram {
     local clean="${2:-false}"
     local build_for_lk="$3"
     local mode="${4:-release}"
-    local libdram_config="${SRC}/config/libdram/${mtk_board}"
+    local libdram_customer=$(get_libdram_customer "$1" "${mtk_board}")
     local build="libdram"
     local extra_flags=""
 
@@ -38,11 +50,12 @@ function build_libdram {
     display_current_build "$1" "${build}" "${mode}"
 
     pushd "${LIBDRAM}"
-    [[ "${clean}" == true ]] && clean_libdram "${mtk_build}" "${mtk_board}" "${libdram_config}"
 
-    if [ -e "${libdram_config}" ]; then
+    [[ "${clean}" == true ]] && clean_libdram "${mtk_build}" "${mtk_board}"
+
+    if [ -n "${libdram_customer}" ]; then
         mkdir -p "boards/${mtk_board}"
-        cp "${libdram_config}" "boards/${mtk_board}/meson.build"
+        cp "${libdram_customer}" "boards/${mtk_board}/meson.build"
     fi
 
     aarch64_env
