@@ -328,7 +328,6 @@ function add_secure_boot_files {
         # authentication file
         generate_auth_file "${secure_config}"
         zip -ju "${package}" "${AUTH_KEY}"
-        rm "${AUTH_KEY}"
     else
         warning "DAA not supported for ${board}"
     fi
@@ -379,7 +378,7 @@ function generate_secure_package {
         warning "Secure boot not supported for ${board}"
     fi
 
-    mv "${package}" "${out_dir}/"
+    mv "${package}" "${AUTH_KEY}" "${out_dir}/"
 
     popd
 }
