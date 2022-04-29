@@ -142,7 +142,10 @@ Options:
   --commit   (OPTIONAL) commit binaries in AOSP
   --config   (OPTIONAL) release ONLY for this board config file
   --help     (OPTIONAL) display usage
+  --mode     (OPTIONAL) [release|debug|factory] build only one mode
   --silent   (OPTIONAL) silent build commands
+
+By default release and debug modes are built.
 
 The changes specified in the commit msg can be read from:
 ${SRC}/.android_commit_changes
@@ -156,7 +159,7 @@ function main {
     local silent=false
     local mode_list=(debug release)
 
-    local opts_args="aosp:,commit,config:,help,silent"
+    local opts_args="aosp:,commit,config:,help,mode:,silent"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -169,6 +172,7 @@ function main {
                 [ -z "${config}" ] && error_usage_exit "Cannot find board config file"
                 shift 2 ;;
             --help) usage; exit 0 ;;
+            --mode) mode_list=("$2"); shift 2 ;;
             --silent) silent=true; shift ;;
             --) shift; break ;;
         esac
@@ -199,6 +203,7 @@ function main {
         for mode in "${mode_list[@]}"; do
             mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
             out_dir=$(out_dir "${mtk_config}" "${mode}")
+            ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_usage_exit "${mode} mode not supported"
 
             if [[ "${silent}" == true ]]; then
                 display_current_build "${mtk_config}" "all" "${mode}"
@@ -217,9 +222,9 @@ function main {
 
         # Trusted Applications
         if [[ "${silent}" == true ]]; then
-            build_android_ta "${mtk_config}" "true" "release" &> /dev/null
+            build_android_ta "${mtk_config}" "true" "${mode}" &> /dev/null
         else
-            build_android_ta "${mtk_config}" "true" "release"
+            build_android_ta "${mtk_config}" "true" "${mode}"
         fi
         cp -r "${out_dir}/optee-ta" "${aosp}/${mtk_binaries_path}"
     done

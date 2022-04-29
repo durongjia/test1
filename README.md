@@ -129,7 +129,10 @@ Options:
   --commit   (OPTIONAL) commit binaries in AOSP
   --config   (OPTIONAL) release ONLY for this board config file
   --help     (OPTIONAL) display usage
+  --mode     (OPTIONAL) [release|debug|factory] build only one mode
   --silent   (OPTIONAL) silent build commands
+
+By default release and debug modes are built.
 ```
 
 ## Secure
