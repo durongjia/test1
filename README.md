@@ -113,9 +113,6 @@ Options:
   --branch   Branch name
   --clean    (OPTIONAL) clean up AOSP projects
   --help     (OPTIONAL) display usage
-
-The changes specified in the commit msg can be read from:
-${BUILD_PATH}/.android_commit_changes
 ```
 
 ## Release Android
@@ -133,6 +130,9 @@ Options:
   --silent   (OPTIONAL) silent build commands
 
 By default release and debug modes are built.
+
+The changes specified in the commit msg can be read from:
+${SRC}/.android_commit_changes
 ```
 
 ## Secure
