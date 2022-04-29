@@ -26,10 +26,7 @@ function get_libdram_customer {
 
 function clean_libdram {
     local mtk_build="$1"
-    local mtk_board="$2"
-
     [ -d "${mtk_build}" ] && rm -r "${mtk_build}"
-    [ -d "boards/${mtk_board}" ] && rm -r "boards/${mtk_board}"
 }
 
 function build_libdram {
@@ -51,9 +48,12 @@ function build_libdram {
 
     pushd "${LIBDRAM}"
 
-    [[ "${clean}" == true ]] && clean_libdram "${mtk_build}" "${mtk_board}"
+    [[ "${clean}" == true ]] && clean_libdram "${mtk_build}"
 
     if [ -n "${libdram_customer}" ]; then
+        if [[ "${clean}" == true ]] && [ -d "boards/${mtk_board}" ]; then
+            rm -r "boards/${mtk_board}"
+        fi
         mkdir -p "boards/${mtk_board}"
         cp "${libdram_customer}" "boards/${mtk_board}/meson.build"
     fi
