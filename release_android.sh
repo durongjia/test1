@@ -48,10 +48,6 @@ function display_commit_msg_header {
     display_center_msg 86 "COMMIT MESSAGE IN:"
     printf "##\n##"
     display_center_msg 86 "${path}"
-    printf "##\n##"
-    printf "%0.s " {1..86}
-    printf "##\n##"
-    display_center_msg 86 "WARNING: u-boot-initial-env files have not been copied"
     printf "##\n"
     printf "%0.s#" {1..90}
     printf "\n\n"
@@ -118,17 +114,6 @@ function add_commit_msg {
         commits_msg_ref+=(["${toplevel}"]="${mtk_config}")
     fi
     popd
-}
-
-function copy_binaries {
-    local mtk_out="$1"
-    local mtk_android_out="$2"
-    local mode="$4"
-    local binaries=("bl2-${mode}.img" "fip_${mode}.bin" "lk-${mode}.bin")
-
-    for binary in "${binaries[@]}"; do
-        cp "${mtk_out}/${binary}" "${mtk_android_out}"
-    done
 }
 
 function usage {
@@ -200,9 +185,9 @@ function main {
 
     pushd "${SRC}"
     for mtk_config in "${configs[@]}"; do
+        mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
+
         for mode in "${mode_list[@]}"; do
-            mtk_binaries_path=$(config_value "${mtk_config}" android.binaries_path)
-            out_dir=$(out_dir "${mtk_config}" "${mode}")
             ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_usage_exit "${mode} mode not supported"
 
             if [[ "${silent}" == true ]]; then
@@ -213,20 +198,22 @@ function main {
             fi
 
             if [ -d "${aosp}/${mtk_binaries_path}" ]; then
-                copy_binaries "${out_dir}" "${aosp}/${mtk_binaries_path}" "${mtk_config}" "${mode}"
                 add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
             else
                 error_exit "cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
             fi
-        done
 
-        # Trusted Applications
-        if [[ "${silent}" == true ]]; then
-            build_android_ta "${mtk_config}" "true" "${mode}" &> /dev/null
-        else
-            build_android_ta "${mtk_config}" "true" "${mode}"
-        fi
-        cp -r "${out_dir}/optee-ta" "${aosp}/${mtk_binaries_path}"
+            # Trusted Applications
+            if [[ "${silent}" == true ]]; then
+                build_android_ta "${mtk_config}" "true" "${mode}" &> /dev/null
+            else
+                build_android_ta "${mtk_config}" "true" "${mode}"
+            fi
+
+            # Copy binaries
+            out_dir=$(out_dir "${mtk_config}" "${mode}")
+            cp -r "${out_dir}/"* "${aosp}/${mtk_binaries_path}"
+        done
     done
     popd
 
