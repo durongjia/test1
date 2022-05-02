@@ -129,6 +129,7 @@ Options:
   --help     (OPTIONAL) display usage
   --mode     (OPTIONAL) [release|debug|factory] build only one mode
   --silent   (OPTIONAL) silent build commands
+  --skip-ta  (OPTIONAL) skip build Trusted Applications
 
 By default release and debug modes are built.
 
@@ -142,9 +143,10 @@ function main {
     local commit=false
     local config=""
     local silent=false
+    local skip_ta=false
     local mode_list=(debug release)
 
-    local opts_args="aosp:,commit,config:,help,mode:,silent"
+    local opts_args="aosp:,commit,config:,help,mode:,silent,skip-ta"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -159,6 +161,7 @@ function main {
             --help) usage; exit 0 ;;
             --mode) mode_list=("$2"); shift 2 ;;
             --silent) silent=true; shift ;;
+            --skip-ta) skip_ta=true; shift ;;
             --) shift; break ;;
         esac
     done
@@ -204,10 +207,12 @@ function main {
             fi
 
             # Trusted Applications
-            if [[ "${silent}" == true ]]; then
-                build_android_ta "${mtk_config}" "true" "${mode}" &> /dev/null
-            else
-                build_android_ta "${mtk_config}" "true" "${mode}"
+            if [[ "${skip_ta}" == false ]]; then
+                if [[ "${silent}" == true ]]; then
+                    build_android_ta "${mtk_config}" "true" "${mode}" &> /dev/null
+                else
+                    build_android_ta "${mtk_config}" "true" "${mode}"
+                fi
             fi
 
             # Copy binaries

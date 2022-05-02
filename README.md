@@ -128,6 +128,7 @@ Options:
   --help     (OPTIONAL) display usage
   --mode     (OPTIONAL) [release|debug|factory] build only one mode
   --silent   (OPTIONAL) silent build commands
+  --skip-ta  (OPTIONAL) skip build Trusted Applications
 
 By default release and debug modes are built.
 
