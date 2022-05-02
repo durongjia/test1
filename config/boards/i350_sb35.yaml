@@ -16,6 +16,7 @@ optee:
 
 uboot:
   defconfig: mt8365_pumpkin_android_ab_defconfig
+  serial: i350sb35
 
 fip:
   cflags: -DNEED_BL32

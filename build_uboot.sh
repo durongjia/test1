@@ -14,18 +14,31 @@ function clean_uboot {
     make mrproper
 }
 
+function generate_uboot_env {
+    local board=$(board_name "$1")
+    local serial=$(config_value "$1" uboot.serial)
+    local out_dir="$2"
+    local mode="$3"
+    local uboot_out_env="${out_dir}/u-boot-initial-${mode}-env"
+
+    ./scripts/get_default_envs.sh > "${uboot_out_env}"
+
+    # board
+    sed -i 's/^\(board=\).*/\1'${board}'/' "${uboot_out_env}"
+
+    # serial
+    if [ -n "${serial}" ]; then
+        sed -i 's/^\(serial#=\).*/\1'${serial}'/' "${uboot_out_env}"
+    fi
+}
+
 function build_uboot {
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
     local defconfig_fragment="${BUILD}/config/defconfig_fragment/uboot-${mode}.config"
-
-    local mtk_defconfig=""
-    local uboot_out_bin=""
-    local uboot_out_env=""
-    mtk_defconfig=$(config_value "$1" uboot.defconfig)
-    uboot_out_bin="${out_dir}/u-boot-${mode}.bin"
-    uboot_out_env="${out_dir}/u-boot-initial-${mode}-env"
+    local mtk_defconfig=$(config_value "$1" uboot.defconfig)
+    local uboot_out_bin="${out_dir}/u-boot-${mode}.bin"
 
     display_current_build "$1" "uboot" "${mode}"
 
@@ -61,7 +74,7 @@ function build_uboot {
 
     make -j"$(nproc)"
 
-    ./scripts/get_default_envs.sh > "${uboot_out_env}"
+    generate_uboot_env "$1" "${out_dir}" "${mode}"
     cp u-boot.bin "${uboot_out_bin}"
 
     unset ARCH
