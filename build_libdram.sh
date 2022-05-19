@@ -26,7 +26,9 @@ function get_libdram_customer {
 
 function clean_libdram {
     local mtk_build="$1"
-    [ -d "${mtk_build}" ] && rm -r "${mtk_build}"
+    if [ -d "${mtk_build}" ]; then
+        rm -r "${mtk_build}"
+    fi
 }
 
 function build_libdram {
