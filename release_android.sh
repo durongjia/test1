@@ -7,9 +7,8 @@ set -o pipefail
 SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/build_all.sh"
 
-PROJECTS_AIOT=("arm-trusted-firmware" "arm-trusted-firmware-mt8516"
-               "libdram" "lk" "optee-os" "u-boot" "build" "libbase-prebuilts"
-               "optee-ta/kmgk" "optee-ta/optee-otp")
+PROJECTS_AIOT=("arm-trusted-firmware" "build" "libbase-prebuilts" "libdram"
+               "lk" "optee-os" "optee-ta/kmgk" "optee-ta/optee-otp" "u-boot")
 
 function check_local_changes {
     local projects=("$@")
