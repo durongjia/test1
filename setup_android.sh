@@ -91,7 +91,7 @@ function main {
         [ -n "${output}" ] && remote="baylibre"
 
         # create branch
-        local repo_branch=$(repo info . 2>&1 | perl -ne 'print "$1" if /^Manifest revision: (.*)/')
+        local repo_branch=$(repo --color=never info . 2>&1 | perl -ne 'print "$1" if /^Manifest revision: (.*)/')
         git fetch --quiet "${remote}" "${repo_branch}"
         git checkout --quiet "${remote}/${repo_branch}" -b "${branch}"
         popd

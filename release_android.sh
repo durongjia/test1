@@ -79,7 +79,7 @@ function commit_msg_body {
         remote_url=$(git remote get-url "${remote_name}")
         body+="URL: ${remote_url}\n"
 
-        branch=$(repo info . 2>&1 | perl -ne 'print "$1" if /^Manifest revision: (.*)/')
+        branch=$(repo --color=never info . 2>&1 | perl -ne 'print "$1" if /^Manifest revision: (.*)/')
         body+="Branch: ${branch}\n"
 
         head=$(git log --oneline --no-decorate -1)
