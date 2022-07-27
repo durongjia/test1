@@ -3,7 +3,7 @@
 BUILD=$(dirname "$(readlink -e "$0")")
 ROOT=$(readlink -e "${BUILD}/../")
 OUT="${ROOT}/out"
-TOOLCHAINS="${ROOT}/toolchains"
+TOOLCHAINS="${SYSTEM_WIDE_TOOLCHAINS:-${ROOT}/toolchains}"
 MODES=("release" "debug" "factory")
 
 INIT_PATH=$PATH
