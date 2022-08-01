@@ -127,6 +127,7 @@ Options:
   --config   (OPTIONAL) release ONLY for this board config file
   --help     (OPTIONAL) display usage
   --mode     (OPTIONAL) [release|debug|factory] build only one mode
+  --no-build (OPTIONAL) don't rebuild the images
   --silent   (OPTIONAL) silent build commands
   --skip-ta  (OPTIONAL) skip build Trusted Applications
 

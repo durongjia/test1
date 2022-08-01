@@ -127,6 +127,7 @@ Options:
   --config   (OPTIONAL) release ONLY for this board config file
   --help     (OPTIONAL) display usage
   --mode     (OPTIONAL) [release|debug|factory] build only one mode
+  --no-build (OPTIONAL) don't rebuild the images
   --silent   (OPTIONAL) silent build commands
   --skip-ta  (OPTIONAL) skip build Trusted Applications
 
@@ -141,11 +142,12 @@ function main {
     local aosp=""
     local commit=false
     local config=""
+    local build=true
     local silent=false
     local skip_ta=false
     local mode_list=(debug release)
 
-    local opts_args="aosp:,commit,config:,help,mode:,silent,skip-ta"
+    local opts_args="aosp:,commit,config:,help,mode:,no-build,silent,skip-ta"
     local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
     eval set -- "${opts}"
 
@@ -159,6 +161,7 @@ function main {
                 shift 2 ;;
             --help) usage; exit 0 ;;
             --mode) mode_list=("$2"); shift 2 ;;
+            --no-build) build=false; shift ;;
             --silent) silent=true; shift ;;
             --skip-ta) skip_ta=true; shift ;;
             --) shift; break ;;
@@ -192,11 +195,13 @@ function main {
         for mode in "${mode_list[@]}"; do
             ! [[ " ${MODES[*]} " =~ " ${mode} " ]] && error_usage_exit "${mode} mode not supported"
 
-            if [[ "${silent}" == true ]]; then
-                display_current_build "${mtk_config}" "all" "${mode}"
-                build_all "${mtk_config}" "true" "${mode}" &> /dev/null
-            else
-                build_all "${mtk_config}" "true" "${mode}"
+            if [[ "${build}" == true ]]; then
+                if [[ "${silent}" == true ]]; then
+                    display_current_build "${mtk_config}" "all" "${mode}"
+                    build_all "${mtk_config}" "true" "${mode}" &> /dev/null
+                else
+                    build_all "${mtk_config}" "true" "${mode}"
+                fi
             fi
 
             if [ -d "${aosp}/${mtk_binaries_path}" ]; then
@@ -206,7 +211,7 @@ function main {
             fi
 
             # Trusted Applications
-            if [[ "${skip_ta}" == false ]]; then
+            if [[ "${build}" == true ]] && [[ "${skip_ta}" == false ]]; then
                 if [[ "${silent}" == true ]]; then
                     build_android_ta "${mtk_config}" "true" "${mode}" &> /dev/null
                 else
