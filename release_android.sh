@@ -103,7 +103,7 @@ function main {
     local out_dir=""
     declare -A commits_msg
 
-    check_local_changes "${PROJECTS_AIOT[@]}"
+    check_local_changes "${ROOT}" "${PROJECTS_AIOT[@]}"
 
     check_env
 
@@ -145,7 +145,7 @@ function main {
     popd
 
     # commits message
-    local commit_body=$(commit_msg_body "aiot" "${PROJECTS_AIOT[@]}")
+    local commit_body=$(commit_msg_body "aiot" "${ROOT}" "${PROJECTS_AIOT[@]}")
     local commit_title=""
     local commit_msg=""
     for path in "${!commits_msg[@]}"; do

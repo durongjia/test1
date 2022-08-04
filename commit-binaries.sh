@@ -60,6 +60,7 @@ function display_commit_msg_header {
 
 function commit_msg_body {
     local remote_name=$1 && shift
+    local from_repo=$1 && shift
     local projects=("$@")
 
     local remote_url=""
@@ -67,7 +68,7 @@ function commit_msg_body {
     local branch=""
 
     for project in "${projects[@]}"; do
-        pushd "${ROOT}/${project}"
+        pushd "${from_repo}/${project}"
         body+="- Project: ${project}:\n"
 
         remote_url=$(git remote get-url "${remote_name}")

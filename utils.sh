@@ -26,10 +26,11 @@ function find_path {
 }
 
 function check_local_changes {
+    local repo_path="$1" && shift
     local projects=("$@")
 
     for project in "${projects[@]}"; do
-        pushd "${ROOT}/${project}"
+        pushd "${repo_path}/${project}"
         if ! git diff-index --quiet HEAD; then
             error_exit "Local changes detected in: ${project}"
         fi
