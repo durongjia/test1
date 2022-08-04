@@ -60,18 +60,6 @@ function commit_msg_body {
     local head=""
     local branch=""
 
-    local body="This update contains following changes:\n"
-    local commit_changes="${SRC}/.android_commit_changes"
-    if [ -f "${commit_changes}" ]; then
-        mapfile < "${commit_changes}" lines
-        for line in "${lines[@]}"; do
-            body+="${line}\n"
-        done
-    else
-        body+="XXXX\n"
-    fi
-
-    body+="\n"
     for project in "${projects[@]}"; do
         pushd "${ROOT}/${project}"
         body+="- Project: ${project}:\n"
@@ -133,8 +121,6 @@ Options:
 
 By default release and debug modes are built.
 
-The changes specified in the commit msg can be read from:
-${SRC}/.android_commit_changes
 DELIM__
 }
 

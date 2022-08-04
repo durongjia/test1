@@ -132,9 +132,6 @@ Options:
   --skip-ta  (OPTIONAL) skip build Trusted Applications
 
 By default release and debug modes are built.
-
-The changes specified in the commit msg can be read from:
-${SRC}/.android_commit_changes
 ```
 
 ## Secure
