@@ -141,24 +141,22 @@ function main {
     done
     popd
 
-    # commits message
-    local commit_body=$(commit_msg_body "aiot" "${ROOT}" "${PROJECTS_AIOT[@]}")
-    local commit_title=""
-    local commit_msg=""
-    for path in "${!commits_msg[@]}"; do
-        pushd "${path}"
+    for abspath in "${!commits_msg[@]}"; do
+        commit_title_prefix="${commits_msg[${abspath}]}"
+        # we need the project name for commit_binaries(), not the
+        # full filepath
+        to_project=${abspath#${aosp}/}
 
-        # display commit
-        display_commit_msg_header "${path}"
-        commit_title="${commits_msg[${path}]}: update binaries\n\n"
-        commit_msg=$(echo -e "${commit_title}${commit_body}")
-        echo "${commit_msg}"
-
-        if [[ "${commit}" == true ]]; then
-            git add --all
-            git commit --quiet -s -m "${commit_msg}"
+        if [ "${commit}" == true ]; then
+            commit_binaries --from-repo="${ROOT}" --from-projects="${PROJECTS_AIOT[*]}" \
+                            --to-repo="${aosp}" --to-project="${to_project}" \
+                            --title-prefix="${commit_title_prefix}"
+        else
+            commit_binaries --from-repo="${ROOT}" --from-projects="${PROJECTS_AIOT[*]}" \
+                            --to-repo="${aosp}" --to-project="${to_project}" \
+                            --title-prefix="${commit_title_prefix}" \
+                            --dry-run
         fi
-        popd
     done
 }
 
