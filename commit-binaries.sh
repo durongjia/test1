@@ -28,6 +28,13 @@ Examples:
 DELIM__
 }
 
+function all_projects_for_repo {
+    local repo_path=$1
+    local projects=$(repo --color=never list --path-only)
+
+    echo $projects
+}
+
 function display_center_msg {
     local line_length="$1"
     local msg="$2"
@@ -86,7 +93,63 @@ function commit_msg_body {
 }
 
 function commit_binaries {
-    echo "TODO: implement me"
+    local from_repo=""
+    local from_projects=""
+    local to_repo=""
+    local to_project=""
+    local title_prefix="generic"
+    local dry_run=false
+
+    local opts_args="from-repo:,from-projects:,to-repo:,to-project:,title-prefix:,dry-run,help"
+    local opts=$(getopt -o '' -l "${opts_args}" -- "$@")
+    eval set -- "${opts}"
+
+    while true; do
+        case "$1" in
+            --from-repo) from_repo=$(find_path "$2"); shift 2 ;;
+            --from-projects) from_projects="$2"; shift 2;;
+            --to-repo) to_repo=$(find_path "$2"); shift 2 ;;
+            --to-project) to_project="$2"; shift 2;;
+            --title-prefix) title_prefix="$2"; shift 2;;
+            --dry-run) dry_run=true; shift ;;
+            --help) usage; exit 0 ;;
+            --) shift; break ;;
+        esac
+    done
+
+    # check arguments
+    ! [ -d "${from_repo}" ] && error_usage_exit "invalid --from-repo: $from_repo"
+    ! [ -d "${to_repo}" ] && error_usage_exit "invalid --to-repo: $to_repo"
+    ! [ -d "${to_repo}/${to_project}" ] && error_usage_exit "invalid --to-project: ${to_repo}/${to_project}"
+
+    # if no projects are specified, use all of them.
+    if [ -z "$from_projects" ]; then
+        from_projects="$(all_projects_for_repo ${from_repo})"
+    fi
+
+    check_local_changes "${from_repo}" $from_projects
+
+    # commits message
+    local commit_body=$(commit_msg_body "aiot" $from_repo $from_projects)
+
+    local commit_title=""
+    local commit_msg=""
+
+    pushd "${to_repo}/${to_project}"
+    # display commit
+    display_commit_msg_header "${to_repo}/${to_project}"
+    commit_title="${title_prefix}: update binaries\n\n"
+    commit_msg=$(echo -e "${commit_title}${commit_body}")
+    echo "${commit_msg}"
+
+    if [[ "${dry_run}" == true ]]; then
+        git add --dry-run --all
+        git commit --dry-run -s -m "${commit_msg}"
+    else
+        git add --all
+        git commit --quiet -s -m "${commit_msg}"
+    fi
+    popd
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
