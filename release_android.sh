@@ -13,25 +13,21 @@ PROJECTS_AIOT=("arm-trusted-firmware" "build" "libbase-prebuilts" "libdram"
 
 function add_commit_msg {
     local -n commits_msg_ref="$1"
-    local mtk_config="$2"
+    local title_prefix="$2"
     local mtk_android_out="$3"
     local toplevel=""
     local commits_msg_value=""
-
-    # mtk_config: keep only basename without extension
-    mtk_config=$(basename "$2")
-    mtk_config="${mtk_config%.*}"
 
     pushd "${mtk_android_out}"
     toplevel=$(git rev-parse --sq --show-toplevel)
     if [[ -v "commits_msg_ref[${toplevel}]" ]]; then
         commits_msg_value="${commits_msg_ref[${toplevel}]}"
-        if ! [[ ${commits_msg_value} =~ ${mtk_config} ]]; then
+        if ! [[ ${commits_msg_value} =~ ${title_prefix} ]]; then
             unset commits_msg_ref["${toplevel}"]
-            commits_msg_ref+=(["${toplevel}"]="${commits_msg_value}/${mtk_config}")
+            commits_msg_ref+=(["${toplevel}"]="${commits_msg_value}/${title_prefix}")
         fi
     else
-        commits_msg_ref+=(["${toplevel}"]="${mtk_config}")
+        commits_msg_ref+=(["${toplevel}"]="${title_prefix}")
     fi
     popd
 }
@@ -140,7 +136,11 @@ function main {
             out_dir=$(out_dir "${mtk_config}" "${mode}")
             cp -r "${out_dir}/"* "${aosp}/${mtk_binaries_path}"
         done
-        add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
+        # mtk_config: keep only basename without extension
+        commit_title_prefix=$(basename ${mtk_config})
+        commit_title_prefix="${commit_title_prefix%.*}"
+
+        add_commit_msg commits_msg "${commit_title_prefix}" "${aosp}/${mtk_binaries_path}"
     done
     popd
 
