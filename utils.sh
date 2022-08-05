@@ -25,6 +25,18 @@ function find_path {
     echo "${real_path}"
 }
 
+function check_local_changes {
+    local projects=("$@")
+
+    for project in "${projects[@]}"; do
+        pushd "${ROOT}/${project}"
+        if ! git diff-index --quiet HEAD; then
+            error_exit "Local changes detected in: ${project}"
+        fi
+        popd
+    done
+}
+
 function aarch64_env {
     export PATH="${TOOLCHAINS}/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin:$PATH"
     export CROSS_COMPILE=aarch64-none-linux-gnu-
