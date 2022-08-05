@@ -123,9 +123,7 @@ function main {
                 fi
             fi
 
-            if [ -d "${aosp}/${mtk_binaries_path}" ]; then
-                add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
-            else
+            if ! [ -d "${aosp}/${mtk_binaries_path}" ]; then
                 error_exit "cannot copy binaries, ${aosp}/${mtk_binaries_path} not found"
             fi
 
@@ -142,6 +140,7 @@ function main {
             out_dir=$(out_dir "${mtk_config}" "${mode}")
             cp -r "${out_dir}/"* "${aosp}/${mtk_binaries_path}"
         done
+        add_commit_msg commits_msg "${mtk_config}" "${aosp}/${mtk_binaries_path}"
     done
     popd
 
