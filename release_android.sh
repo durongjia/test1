@@ -136,10 +136,7 @@ function main {
             out_dir=$(out_dir "${mtk_config}" "${mode}")
             cp -r "${out_dir}/"* "${aosp}/${mtk_binaries_path}"
         done
-        # mtk_config: keep only basename without extension
-        commit_title_prefix=$(basename ${mtk_config})
-        commit_title_prefix="${commit_title_prefix%.*}"
-
+        commit_title_prefix=$(board_name ${mtk_config})
         add_commit_msg commits_msg "${commit_title_prefix}" "${aosp}/${mtk_binaries_path}"
     done
     popd
