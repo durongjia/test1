@@ -143,8 +143,9 @@ function commit_binaries {
     echo "${commit_msg}"
 
     if [[ "${dry_run}" == true ]]; then
-        git add --dry-run --all
+        git add --all
         git commit --dry-run -s -m "${commit_msg}"
+        git restore --staged .
     else
         git add --all
         git commit --quiet -s -m "${commit_msg}"
