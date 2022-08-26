@@ -161,3 +161,13 @@ Examples:
   $ commit-binaries.sh --from-repo=/home/user/src/android-common-kernel --from-projects='common hikey-modules' \
                        --to-repo=/home/user/src/aosp --to-project=device/amlogic/yukawa-kernel
 ```
+
+## Splashscreen
+``` {.sh}
+usage: splashscreen.sh IMAGE_PATH [convert options]
+
+Generate splashscreen.img file from IMAGE_PATH.
+
+For more infos on [convert options]:
+$ man convert
+```
