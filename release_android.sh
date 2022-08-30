@@ -8,8 +8,9 @@ SRC=$(dirname "$(readlink -e "$0")")
 source "${SRC}/build_all.sh"
 source "${SRC}/commit-binaries.sh"
 
-PROJECTS_AIOT=("arm-trusted-firmware" "build" "libbase-prebuilts" "libdram"
-               "lk" "optee-os" "optee-ta/kmgk" "optee-ta/optee-otp" "u-boot")
+PROJECTS_AIOT=("arm-trusted-firmware" "build" "libbase-prebuilts" "libdram" "lk"
+               "optee-os" "optee-ta/kmgk" "optee-ta/optee-otp" "optee-ta/optee_test"
+               "u-boot")
 
 function add_commit_msg {
     local -n commits_msg_ref="$1"
