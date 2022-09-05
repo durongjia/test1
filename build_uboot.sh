@@ -14,29 +14,33 @@ function clean_uboot {
     make mrproper
 }
 
-function generate_uboot_env {
-    local board=$(board_name "$1")
-    local serial=$(config_value "$1" uboot.serial)
-    local out_dir="$2"
-    local mode="$3"
-    local uboot_out_env="${out_dir}/u-boot-initial-${mode}-env"
+function merge_config {
+    local mode="${1}"
+    local board="${2}"
+    local config_root="${3}"
+    local mode_fragment="${BUILD}/config/defconfig_fragment/uboot-${mode}.config"
+    local board_fragment="${config_root}/defconfig_fragment/uboot-${board}.config"
+    declare -a configs
 
-    ./scripts/get_default_envs.sh > "${uboot_out_env}"
+    if [ -a "${mode_fragment}" ]; then
+        configs+=("${mode_fragment}")
+    fi
 
-    # board
-    sed -i 's/^\(board=\).*/\1'${board}'/' "${uboot_out_env}"
+    if [ -a "${board_fragment}" ]; then
+        configs+=("${board_fragment}")
+    fi
 
-    # serial
-    if [ -n "${serial}" ]; then
-        sed -i 's/^\(serial#=\).*/\1'${serial}'/' "${uboot_out_env}"
+    if [[ "${configs[*]}" ]]; then
+        scripts/kconfig/merge_config.sh .config "${configs[*]}"
     fi
 }
 
 function build_uboot {
+    local config_root=$(config_root "$1")
+    local board=$(board_name "$1")
     local clean="${2:-false}"
     local mode="${3:-release}"
     local out_dir=$(out_dir "$1" "${mode}")
-    local defconfig_fragment="${BUILD}/config/defconfig_fragment/uboot-${mode}.config"
     local mtk_defconfig=$(config_value "$1" uboot.defconfig)
     local uboot_out_bin="${out_dir}/u-boot-${mode}.bin"
 
@@ -57,9 +61,7 @@ function build_uboot {
 
     # generate defconfig
     make "${mtk_defconfig}"
-    if [ -a "${defconfig_fragment}" ]; then
-        scripts/kconfig/merge_config.sh .config "${defconfig_fragment}"
-    fi
+    merge_config "${mode}" "${board}" "${config_root}"
 
     # avb key only on release/factory
     if ! [[ "${mode}" == "debug" ]]; then
@@ -74,7 +76,7 @@ function build_uboot {
 
     make -j"$(nproc)"
 
-    generate_uboot_env "$1" "${out_dir}" "${mode}"
+    ./scripts/get_default_envs.sh > "${out_dir}/u-boot-initial-${mode}-env"
     cp u-boot.bin "${uboot_out_bin}"
 
     unset ARCH
