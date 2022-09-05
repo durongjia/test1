@@ -54,6 +54,18 @@ By default release and debug modes are built.
 DELIM__
 }
 
+function find_all_configs {
+    local -n configs_ref="$1"
+
+    configs_ref=("${SRC}"/config/boards/*.yaml)
+
+    for root_folder in "${ROOT}"/config_*; do
+        for config_folder in "${root_folder}"/boards/*.yaml; do
+            configs_ref+=("${config_folder}")
+        done
+    done
+}
+
 function main {
     local aosp=""
     local commit=false
@@ -92,7 +104,7 @@ function main {
     if [ -n "${config}" ]; then
         configs=("${config}")
     else
-        configs=("${SRC}"/config/boards/*.yaml)
+        find_all_configs configs
     fi
 
     # build configs
