@@ -92,6 +92,11 @@ function board_name {
     echo "${yaml_config%.yaml}"
 }
 
+function config_root {
+    local config_root="$(dirname "${1}")/.."
+    echo "$(readlink -e "${config_root}")"
+}
+
 function out_dir {
     local board=$(board_name "$1")
     local mode="${2:-release}"
