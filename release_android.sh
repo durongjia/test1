@@ -61,7 +61,9 @@ function find_all_configs {
 
     for root_folder in "${ROOT}"/config_*; do
         for config_folder in "${root_folder}"/boards/*.yaml; do
-            configs_ref+=("${config_folder}")
+            if [[ -f "${config_folder}" ]]; then
+                configs_ref+=("${config_folder}")
+            fi
         done
     done
 }
